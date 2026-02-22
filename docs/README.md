@@ -1,6 +1,6 @@
-# Sistema de Gestão Educacional CECOR
+# Sistema de Gestão Educacional LAR CECOR
 
-Sistema de gestão educacional para o CECOR (Lar do Alvorecer), projetado para administrar alunos, cursos, matrículas e frequências de forma integrada e segura.
+Sistema de gestão educacional para o LAR CECOR (Lar do Alvorecer), projetado para administrar alunos, cursos, matrículas e frequências de forma integrada e segura.
 
 ## Status atual (22/02/2026)
 
@@ -54,8 +54,8 @@ O projeto segue uma arquitetura moderna e escalável:
 1. **Clone o repositório:**
 
    ```bash
-   git clone https://github.com/seu-usuario/cecor.git
-   cd cecor
+   git clone https://github.com/seu-usuario/lar-cecor.git
+   cd lar-cecor
    ```
 
 2. **Configure o ambiente:**
@@ -84,7 +84,7 @@ O sistema utiliza o Keycloak para autenticação. Utilize as credenciais abaixo 
 ## 🧩 Estrutura do Projeto
 
 ```
-CECOR/
+LAR-CECOR/
 ├── backend/                # API REST em Go
 │   ├── cmd/api/            # Entrypoint
 │   ├── internal/           # Domínio, Serviços, Repositórios (Core)

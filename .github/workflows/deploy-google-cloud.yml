@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          IMAGE_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPOSITORY}/cecor-backend:${GITHUB_SHA}"
+          IMAGE_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/${ARTIFACT_REPOSITORY}/lar-cecor-backend:${GITHUB_SHA}"
           docker build -t "${IMAGE_URI}" ./backend
           docker push "${IMAGE_URI}"
           echo "IMAGE_URI=${IMAGE_URI}" >> "$GITHUB_ENV"
@@ -117,4 +117,3 @@ jobs:
             --project "${PROJECT_ID}" \
             --region "${REGION}" \
             --format='value(status.url)'
-

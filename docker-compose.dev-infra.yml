@@ -1,11 +1,11 @@
-# CECOR - Infra local para desenvolvimento
+# LAR CECOR - Infra local para desenvolvimento
 # Objetivo: rodar apenas dependências (DB/cache/mensageria) via Docker.
 # Backend e Frontend devem rodar localmente (go run / npm start).
 
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: cecor-dev-postgres
+    container_name: lar-cecor-dev-postgres
     environment:
       POSTGRES_USER: cecor
       POSTGRES_PASSWORD: cecor123
@@ -23,7 +23,7 @@ services:
 
   mongodb:
     image: mongo:7.0
-    container_name: cecor-dev-mongodb
+    container_name: lar-cecor-dev-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
@@ -35,7 +35,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: cecor-dev-redis
+    container_name: lar-cecor-dev-redis
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
@@ -44,7 +44,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: cecor-dev-rabbitmq
+    container_name: lar-cecor-dev-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
