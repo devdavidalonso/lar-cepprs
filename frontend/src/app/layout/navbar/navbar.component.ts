@@ -46,8 +46,8 @@ import { AuthService } from '../../core/services/auth.service';
       <!-- Menu de navegação para desktop -->
       <div class="nav-links">
         <a mat-button routerLink="/dashboard">Dashboard</a>
-        <a mat-button routerLink="/alunos">Alunos</a>
-        <a mat-button routerLink="/cursos">Cursos</a>
+        <a mat-button routerLink="/students">Alunos</a>
+        <a mat-button routerLink="/courses">Cursos</a>
       </div>
       
       <!-- Notificações -->
@@ -64,11 +64,11 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="user-name">{{user.name}}</div>
           <div class="user-email">{{user.email}}</div>
         </div>
-        <a mat-menu-item routerLink="/perfil">
+        <a mat-menu-item routerLink="/profile">
           <mat-icon>account_circle</mat-icon>
           <span>Meu Perfil</span>
         </a>
-        <a mat-menu-item routerLink="/configuracoes">
+        <a mat-menu-item routerLink="/administration/settings">
           <mat-icon>settings</mat-icon>
           <span>Configurações</span>
         </a>

@@ -14,8 +14,13 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
   {
+    path: 'access-denied',
+    loadComponent: () => import('./shared/components/access-denied/access-denied.component').then(m => m.AccessDeniedComponent)
+  },
+  {
     path: 'acesso-negado',
-    loadComponent: () => import('./shared/components/acesso-negado/acesso-negado.component').then(m => m.AcessoNegadoComponent)
+    redirectTo: 'access-denied',
+    pathMatch: 'full'
   },
   {
     path: '',

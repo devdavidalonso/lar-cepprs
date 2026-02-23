@@ -23,38 +23,38 @@ func NewTeacherHandler(service teachers.Service) *TeacherHandler {
 	}
 }
 
-// CreateProfessor handles the creation of a new professor
-func (h *TeacherHandler) CreateProfessor(w http.ResponseWriter, r *http.Request) {
-	var professor models.User
-	if err := json.NewDecoder(r.Body).Decode(&professor); err != nil {
+// CreateTeacher handles the creation of a new teacher.
+func (h *TeacherHandler) CreateTeacher(w http.ResponseWriter, r *http.Request) {
+	var teacher models.User
+	if err := json.NewDecoder(r.Body).Decode(&teacher); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.service.CreateProfessor(r.Context(), &professor); err != nil {
+	if err := h.service.CreateTeacher(r.Context(), &teacher); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(professor)
+	json.NewEncoder(w).Encode(teacher)
 }
 
-// GetProfessors handles the retrieval of all professors
-func (h *TeacherHandler) GetProfessors(w http.ResponseWriter, r *http.Request) {
-	professors, err := h.service.GetProfessors(r.Context())
+// GetTeachers handles the retrieval of all teachers.
+func (h *TeacherHandler) GetTeachers(w http.ResponseWriter, r *http.Request) {
+	teachers, err := h.service.GetTeachers(r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(professors)
+	json.NewEncoder(w).Encode(teachers)
 }
 
-// GetProfessorByID handles the retrieval of a professor by ID
-func (h *TeacherHandler) GetProfessorByID(w http.ResponseWriter, r *http.Request) {
+// GetTeacherByID handles the retrieval of a teacher by ID.
+func (h *TeacherHandler) GetTeacherByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -62,18 +62,18 @@ func (h *TeacherHandler) GetProfessorByID(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	professor, err := h.service.GetProfessorByID(r.Context(), uint(id))
+	teacher, err := h.service.GetTeacherByID(r.Context(), uint(id))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(professor)
+	json.NewEncoder(w).Encode(teacher)
 }
 
-// UpdateProfessor handles the update of a professor
-func (h *TeacherHandler) UpdateProfessor(w http.ResponseWriter, r *http.Request) {
+// UpdateTeacher handles the update of a teacher.
+func (h *TeacherHandler) UpdateTeacher(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -81,25 +81,25 @@ func (h *TeacherHandler) UpdateProfessor(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var professor models.User
-	if err := json.NewDecoder(r.Body).Decode(&professor); err != nil {
+	var teacher models.User
+	if err := json.NewDecoder(r.Body).Decode(&teacher); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	professor.ID = uint(id)
+	teacher.ID = uint(id)
 
-	if err := h.service.UpdateProfessor(r.Context(), &professor); err != nil {
+	if err := h.service.UpdateTeacher(r.Context(), &teacher); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(professor)
+	json.NewEncoder(w).Encode(teacher)
 }
 
-// DeleteProfessor handles the deletion of a professor
-func (h *TeacherHandler) DeleteProfessor(w http.ResponseWriter, r *http.Request) {
+// DeleteTeacher handles the deletion of a teacher.
+func (h *TeacherHandler) DeleteTeacher(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -107,10 +107,35 @@ func (h *TeacherHandler) DeleteProfessor(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := h.service.DeleteProfessor(r.Context(), uint(id)); err != nil {
+	if err := h.service.DeleteTeacher(r.Context(), uint(id)); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// Deprecated: use CreateTeacher.
+func (h *TeacherHandler) CreateProfessor(w http.ResponseWriter, r *http.Request) {
+	h.CreateTeacher(w, r)
+}
+
+// Deprecated: use GetTeachers.
+func (h *TeacherHandler) GetProfessors(w http.ResponseWriter, r *http.Request) {
+	h.GetTeachers(w, r)
+}
+
+// Deprecated: use GetTeacherByID.
+func (h *TeacherHandler) GetProfessorByID(w http.ResponseWriter, r *http.Request) {
+	h.GetTeacherByID(w, r)
+}
+
+// Deprecated: use UpdateTeacher.
+func (h *TeacherHandler) UpdateProfessor(w http.ResponseWriter, r *http.Request) {
+	h.UpdateTeacher(w, r)
+}
+
+// Deprecated: use DeleteTeacher.
+func (h *TeacherHandler) DeleteProfessor(w http.ResponseWriter, r *http.Request) {
+	h.DeleteTeacher(w, r)
 }

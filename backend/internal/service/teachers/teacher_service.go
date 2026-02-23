@@ -11,44 +11,51 @@ import (
 	"github.com/devdavidalonso/cecor/backend/internal/service/keycloak"
 )
 
-// Service defines the professor service interface
+// Service defines the teacher service interface.
 type Service interface {
-	CreateProfessor(ctx context.Context, professor *models.User) error
+	CreateTeacher(ctx context.Context, teacher *models.User) error
+	GetTeachers(ctx context.Context) ([]models.User, error)
+	GetTeacherByID(ctx context.Context, id uint) (*models.User, error)
+	UpdateTeacher(ctx context.Context, teacher *models.User) error
+	DeleteTeacher(ctx context.Context, id uint) error
+
+	// Deprecated: compatibility aliases kept for gradual migration.
+	CreateProfessor(ctx context.Context, teacher *models.User) error
 	GetProfessors(ctx context.Context) ([]models.User, error)
 	GetProfessorByID(ctx context.Context, id uint) (*models.User, error)
-	UpdateProfessor(ctx context.Context, professor *models.User) error
+	UpdateProfessor(ctx context.Context, teacher *models.User) error
 	DeleteProfessor(ctx context.Context, id uint) error
 }
 
-// professorService implements the Service interface
-type professorService struct {
+// teacherService implements the Service interface.
+type teacherService struct {
 	userRepo repository.UserRepository
 	keycloak *keycloak.KeycloakService
 	email    *email.EmailService
 }
 
-// NewService creates a new instance of professorService
+// NewService creates a new instance of teacherService.
 func NewService(userRepo repository.UserRepository, keycloak *keycloak.KeycloakService, email *email.EmailService) Service {
-	return &professorService{
+	return &teacherService{
 		userRepo: userRepo,
 		keycloak: keycloak,
 		email:    email,
 	}
 }
 
-// CreateProfessor creates a new professor
-func (s *professorService) CreateProfessor(ctx context.Context, professor *models.User) error {
+// CreateTeacher creates a new teacher.
+func (s *teacherService) CreateTeacher(ctx context.Context, teacher *models.User) error {
 	// Validate required fields
-	if professor.Name == "" || professor.Email == "" {
+	if teacher.Name == "" || teacher.Email == "" {
 		return fmt.Errorf("name and email are required")
 	}
 
 	// Set profile as 'professor' (ProfileID = 2)
-	professor.ProfileID = 2
-	professor.Active = true
+	teacher.ProfileID = 2
+	teacher.Active = true
 
 	// Check if user already exists
-	existing, err := s.userRepo.FindByEmail(ctx, professor.Email)
+	existing, err := s.userRepo.FindByEmail(ctx, teacher.Email)
 	if err != nil {
 		return fmt.Errorf("error checking existing email: %w", err)
 	}
@@ -58,25 +65,25 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 
 	// Create user in database
 	// Set placeholder password
-	professor.Password = "temp123456"
+	teacher.Password = "temp123456"
 
-	if err := s.userRepo.Create(ctx, professor); err != nil {
+	if err := s.userRepo.Create(ctx, teacher); err != nil {
 		return fmt.Errorf("error creating professor in database: %w", err)
 	}
 
 	if err := s.userRepo.UpsertTeacherProfile(
 		ctx,
-		professor.ID,
-		professor.Specialization,
-		professor.Bio,
-		professor.Phone,
-		professor.Active,
+		teacher.ID,
+		teacher.Specialization,
+		teacher.Bio,
+		teacher.Phone,
+		teacher.Active,
 	); err != nil {
 		return fmt.Errorf("error creating teacher profile metadata: %w", err)
 	}
 
-	if professor.ProgramIDs != nil {
-		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, professor.ID, professor.ProgramIDs); err != nil {
+	if teacher.ProgramIDs != nil {
+		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, teacher.ID, teacher.ProgramIDs); err != nil {
 			return fmt.Errorf("error linking teacher to programs: %w", err)
 		}
 	}
@@ -88,7 +95,7 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 
 		// Create user
 		// Split name
-		nameParts := strings.Fields(professor.Name)
+		nameParts := strings.Fields(teacher.Name)
 		firstName := nameParts[0]
 		lastName := ""
 		if len(nameParts) > 1 {
@@ -96,8 +103,8 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 		}
 
 		req := keycloak.CreateUserRequest{
-			Username:      professor.Email,
-			Email:         professor.Email,
+			Username:      teacher.Email,
+			Email:         teacher.Email,
 			FirstName:     firstName,
 			LastName:      lastName,
 			Enabled:       true,
@@ -119,12 +126,12 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 			}
 
 			// Update user with Keycloak ID
-			professor.KeycloakUserID = &keycloakID
-			s.userRepo.Update(ctx, professor)
+			teacher.KeycloakUserID = &keycloakID
+			s.userRepo.Update(ctx, teacher)
 
 			// Send email
 			if s.email != nil {
-				s.email.SendWelcomeEmail(professor.Email, professor.Name, tempPassword)
+				s.email.SendWelcomeEmail(teacher.Email, teacher.Name, tempPassword)
 			}
 		}
 	}
@@ -132,8 +139,8 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 	return nil
 }
 
-// GetProfessors returns all professors
-func (s *professorService) GetProfessors(ctx context.Context) ([]models.User, error) {
+// GetTeachers returns all teachers.
+func (s *teacherService) GetTeachers(ctx context.Context) ([]models.User, error) {
 	professors, err := s.userRepo.FindByProfileID(ctx, 2)
 	if err != nil {
 		return nil, err
@@ -148,8 +155,8 @@ func (s *professorService) GetProfessors(ctx context.Context) ([]models.User, er
 	return professors, nil
 }
 
-// GetProfessorByID returns a professor by ID
-func (s *professorService) GetProfessorByID(ctx context.Context, id uint) (*models.User, error) {
+// GetTeacherByID returns a teacher by ID.
+func (s *teacherService) GetTeacherByID(ctx context.Context, id uint) (*models.User, error) {
 	// Call FindByIDWithAssociations instead of FindByID to load contacts and address
 	user, err := s.userRepo.FindByIDWithAssociations(ctx, id)
 	if err != nil {
@@ -167,25 +174,25 @@ func (s *professorService) GetProfessorByID(ctx context.Context, id uint) (*mode
 	return user, nil
 }
 
-// UpdateProfessor updates a professor
-func (s *professorService) UpdateProfessor(ctx context.Context, professor *models.User) error {
-	existing, err := s.GetProfessorByID(ctx, professor.ID)
+// UpdateTeacher updates a teacher.
+func (s *teacherService) UpdateTeacher(ctx context.Context, teacher *models.User) error {
+	existing, err := s.GetTeacherByID(ctx, teacher.ID)
 	if err != nil {
 		return err
 	}
 
 	// Update allowed fields
-	existing.Name = professor.Name
-	existing.Phone = professor.Phone
-	existing.CPF = professor.CPF
-	existing.Specialization = professor.Specialization
-	existing.Bio = professor.Bio
-	existing.LinkedinURL = professor.LinkedinURL
-	existing.ProgramIDs = professor.ProgramIDs
+	existing.Name = teacher.Name
+	existing.Phone = teacher.Phone
+	existing.CPF = teacher.CPF
+	existing.Specialization = teacher.Specialization
+	existing.Bio = teacher.Bio
+	existing.LinkedinURL = teacher.LinkedinURL
+	existing.ProgramIDs = teacher.ProgramIDs
 
 	// Include associations payload
-	existing.Address = professor.Address
-	existing.UserContacts = professor.UserContacts
+	existing.Address = teacher.Address
+	existing.UserContacts = teacher.UserContacts
 
 	if err := s.userRepo.UpdateWithAssociations(ctx, existing); err != nil {
 		return err
@@ -202,8 +209,8 @@ func (s *professorService) UpdateProfessor(ctx context.Context, professor *model
 		return fmt.Errorf("error updating teacher profile metadata: %w", err)
 	}
 
-	if professor.ProgramIDs != nil {
-		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, existing.ID, professor.ProgramIDs); err != nil {
+	if teacher.ProgramIDs != nil {
+		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, existing.ID, teacher.ProgramIDs); err != nil {
 			return fmt.Errorf("error updating teacher programs: %w", err)
 		}
 	}
@@ -211,10 +218,10 @@ func (s *professorService) UpdateProfessor(ctx context.Context, professor *model
 	return nil
 }
 
-// DeleteProfessor deletes a professor
-func (s *professorService) DeleteProfessor(ctx context.Context, id uint) error {
+// DeleteTeacher deletes a teacher.
+func (s *teacherService) DeleteTeacher(ctx context.Context, id uint) error {
 	// Check if exists
-	_, err := s.GetProfessorByID(ctx, id)
+	_, err := s.GetTeacherByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -224,7 +231,7 @@ func (s *professorService) DeleteProfessor(ctx context.Context, id uint) error {
 	return s.userRepo.Delete(ctx, id)
 }
 
-func (s *professorService) hydrateTeacherMetadata(ctx context.Context, user *models.User) error {
+func (s *teacherService) hydrateTeacherMetadata(ctx context.Context, user *models.User) error {
 	teacherProfile, err := s.userRepo.GetTeacherProfileByUserID(ctx, user.ID)
 	if err != nil {
 		return fmt.Errorf("error loading teacher profile metadata: %w", err)
@@ -245,4 +252,29 @@ func (s *professorService) hydrateTeacherMetadata(ctx context.Context, user *mod
 	user.ProgramIDs = programIDs
 
 	return nil
+}
+
+// Deprecated: use CreateTeacher.
+func (s *teacherService) CreateProfessor(ctx context.Context, teacher *models.User) error {
+	return s.CreateTeacher(ctx, teacher)
+}
+
+// Deprecated: use GetTeachers.
+func (s *teacherService) GetProfessors(ctx context.Context) ([]models.User, error) {
+	return s.GetTeachers(ctx)
+}
+
+// Deprecated: use GetTeacherByID.
+func (s *teacherService) GetProfessorByID(ctx context.Context, id uint) (*models.User, error) {
+	return s.GetTeacherByID(ctx, id)
+}
+
+// Deprecated: use UpdateTeacher.
+func (s *teacherService) UpdateProfessor(ctx context.Context, teacher *models.User) error {
+	return s.UpdateTeacher(ctx, teacher)
+}
+
+// Deprecated: use DeleteTeacher.
+func (s *teacherService) DeleteProfessor(ctx context.Context, id uint) error {
+	return s.DeleteTeacher(ctx, id)
 }

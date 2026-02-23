@@ -336,6 +336,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
       roles: ['admin', 'administrador'],
     },
     {
+      text: 'NAV.LOCATIONS',
+      icon: 'meeting_room',
+      route: '/locations',
+      roles: ['admin', 'administrador'],
+    },
+    {
       text: 'NAV.VOLUNTEERING',
       icon: 'volunteer_activism',
       route: '/volunteering',

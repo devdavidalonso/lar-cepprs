@@ -116,7 +116,7 @@ type zapLogger struct {
 func (l *zapLogger) Info(msg string, keysAndValues ...interface{}) {
 	// Adicionar campos padrão para todos os logs
 	standardFields := []interface{}{
-		"service", "lar-cecor-backend",
+		"service", "lar-cepprs-backend",
 		"version", os.Getenv("APP_VERSION"),
 		"env", os.Getenv("APP_ENV"),
 	}

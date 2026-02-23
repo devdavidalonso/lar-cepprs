@@ -72,3 +72,13 @@ cd /home/david-alonso/Projetos/cecor && ./scripts/smoke_rbac_keycloak.sh
 4. Completar UX/fluxo do professor para lancamento de presenca direto na tela de turma/alunos.
 5. Completar menu do professor (links e atalhos operacionais para chamada).
 6. Corrigir calculo de carga horaria do curso (workload negativo observado em homologacao).
+
+## Decisoes e implementacoes consolidadas (memoria de produto)
+
+1. O projeto passa a adotar o nome de produto `LAR CEPPRS` (renomeacao progressiva de branding e deploy IDs).
+2. O menu admin deve expor cadastro de dominio para `Locais e Salas`.
+3. A capacidade de matriculas deve refletir a capacidade operacional:
+   - regra aplicada no backend para bloquear matricula quando `max_students` do curso atingir limite.
+4. Staging e production devem usar variaveis/secrets em GitHub Environments (sem `.env` versionado).
+5. Validacao critica da entidade de dominio `locations` documentada em:
+   - `docs/LOCATIONS_ENTIDADE_VALIDACAO.md`

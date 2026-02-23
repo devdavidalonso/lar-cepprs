@@ -24,8 +24,8 @@ func Register(r chi.Router, cfg *config.Config, authHandler *handlers.AuthHandle
 		// Endpoint de verificação de token
 		r.Get("/auth/verify", authHandler.Verify)
 
-			// Courses
-			r.Route("/courses", func(r chi.Router) {
+		// Courses
+		r.Route("/courses", func(r chi.Router) {
 			r.Get("/", courseHandler.ListCourses)
 			r.Post("/", courseHandler.CreateCourse)
 			r.Get("/{id}", courseHandler.GetCourse)
@@ -95,11 +95,11 @@ func Register(r chi.Router, cfg *config.Config, authHandler *handlers.AuthHandle
 
 		// Teachers
 		r.Route("/teachers", func(r chi.Router) {
-			r.Post("/", teacherHandler.CreateProfessor)
-			r.Get("/", teacherHandler.GetProfessors)
-			r.Get("/{id}", teacherHandler.GetProfessorByID)
-			r.Put("/{id}", teacherHandler.UpdateProfessor)
-			r.Delete("/{id}", teacherHandler.DeleteProfessor)
+			r.Post("/", teacherHandler.CreateTeacher)
+			r.Get("/", teacherHandler.GetTeachers)
+			r.Get("/{id}", teacherHandler.GetTeacherByID)
+			r.Put("/{id}", teacherHandler.UpdateTeacher)
+			r.Delete("/{id}", teacherHandler.DeleteTeacher)
 		})
 	})
 }

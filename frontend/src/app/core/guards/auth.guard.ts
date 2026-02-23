@@ -19,7 +19,7 @@ export const AuthGuard: CanActivateFn = (route, state) => {
       const authorized = normalizedRequired.some(role => userRoles.includes(role));
 
       if (!authorized) {
-        router.navigate(['/acesso-negado']);
+        router.navigate(['/access-denied']);
         return false;
       }
     }

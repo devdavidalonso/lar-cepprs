@@ -1,5 +1,5 @@
 {
-    "name": "lar-cecor-frontend",
+    "name": "lar-cepprs-frontend",
     "version": "0.0.0",
     "scripts": {
         "ng": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng",
@@ -11,7 +11,8 @@
         "build:production": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration=production",
         "build:prototype": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration=prototype",
         "watch": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --watch --configuration development",
-        "test": "ng test"
+        "test": "ng test",
+        "check:hardcoded-messages": "bash ./scripts/check-hardcoded-messages.sh"
     },
     "private": true,
     "dependencies": {

@@ -1,5 +1,5 @@
 # ===================================
-# LAR CECOR - Makefile Profissional
+# LAR CEPPRS - Makefile Profissional
 # ===================================
 
 COMPOSE=docker compose
@@ -20,9 +20,9 @@ help:
 	@echo " make restart      -> Reinicia ambiente"
 	@echo ""
 	@echo "STAGING (Keycloak local lar-sso):"
-	@echo " make up-staging      -> Sobe LAR CECOR usando Keycloak do lar-sso"
-	@echo " make down-staging    -> Derruba LAR CECOR staging"
-	@echo " make restart-staging -> Reinicia LAR CECOR staging"
+	@echo " make up-staging      -> Sobe LAR CEPPRS usando Keycloak do lar-sso"
+	@echo " make down-staging    -> Derruba LAR CEPPRS staging"
+	@echo " make restart-staging -> Reinicia LAR CEPPRS staging"
 	@echo " make logs-staging    -> Logs do staging"
 	@echo ""
 	@echo "LOCAL (sem Docker):"
@@ -50,8 +50,8 @@ help:
 	@echo "======================================="
 	@echo ""
 	@echo "URLs STAGING:"
-	@echo "  LAR CECOR Frontend: http://localhost:4201"
-	@echo "  LAR CECOR Backend:  http://localhost:8081"
+	@echo "  LAR CEPPRS Frontend: http://localhost:4201"
+	@echo "  LAR CEPPRS Backend:  http://localhost:8081"
 	@echo "  Keycloak:       http://localhost:8081 (do lar-sso)"
 	@echo "======================================="
 
@@ -91,7 +91,7 @@ format:
 # --- Staging Commands (usa Keycloak do lar-sso) ---
 
 up-staging:
-	@echo "Subindo LAR CECOR em modo STAGING (usando Keycloak do lar-sso)..."
+	@echo "Subindo LAR CEPPRS em modo STAGING (usando Keycloak do lar-sso)..."
 	@echo "Certifique-se de que o lar-sso está rodando: cd ../lar-sso && make up"
 	$(COMPOSE_STAGING) up --build -d
 

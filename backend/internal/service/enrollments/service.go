@@ -92,6 +92,29 @@ func (s *service) EnrollStudent(ctx context.Context, enrollment *models.Enrollme
 		}
 	}
 
+	// 1.3 Validate course capacity (max students)
+	if course.MaxStudents > 0 {
+		courseEnrollments, err := s.repo.ListByCourse(ctx, enrollment.CourseID)
+		if err != nil {
+			return fmt.Errorf("failed to validate course capacity: %w", err)
+		}
+
+		activeCount := 0
+		for _, e := range courseEnrollments {
+			if e.Status == "active" {
+				activeCount++
+			}
+		}
+
+		if activeCount >= course.MaxStudents {
+			return fmt.Errorf(
+				"course capacity reached: %d/%d active enrollments",
+				activeCount,
+				course.MaxStudents,
+			)
+		}
+	}
+
 	// 2. Generate Enrollment Number if not provided
 	if enrollment.EnrollmentNumber == "" {
 		enrollment.EnrollmentNumber = fmt.Sprintf("MAT-%d-%d", enrollment.StudentID, time.Now().Unix())
