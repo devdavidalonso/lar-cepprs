@@ -251,11 +251,11 @@ func (r *userRepository) FindByProfile(ctx context.Context, profile string) ([]m
 	// Map profile name to ID
 	var profileID uint
 	switch profile {
-	case "admin":
+	case "admin", "administrator":
 		profileID = 1
 	case "teacher", "professor":
 		profileID = 2
-	case "student":
+	case "student", "aluno":
 		profileID = 3
 	default:
 		profileID = 3 // Default to student
@@ -267,9 +267,9 @@ func (r *userRepository) FindByProfile(ctx context.Context, profile string) ([]m
 func profileTextFromID(profileID uint) string {
 	switch profileID {
 	case 1:
-		return "admin"
+		return "administrator"
 	case 2:
-		return "professor"
+		return "teacher"
 	case 3:
 		return "student"
 	default:

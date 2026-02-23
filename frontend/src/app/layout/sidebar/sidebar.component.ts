@@ -38,7 +38,7 @@ interface MenuItem {
 
       <!-- Cabeçalho / Logo -->
       <div class="sidebar-header">
-        <img src="assets/images/cecor-logo.png" alt="CECOR" class="logo-cecor" />
+        <img src="assets/images/cecor-logo.png" alt="LAR-CEPPRS" class="logo-cecor" />
       </div>
 
       <!-- Usuário Logado -->

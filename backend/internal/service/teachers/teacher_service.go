@@ -29,17 +29,19 @@ type Service interface {
 
 // teacherService implements the Service interface.
 type teacherService struct {
-	userRepo repository.UserRepository
-	keycloak *keycloak.KeycloakService
-	email    *email.EmailService
+	userRepo    repository.UserRepository
+	programRepo repository.ProgramRepository
+	keycloak    *keycloak.KeycloakService
+	email       *email.EmailService
 }
 
 // NewService creates a new instance of teacherService.
-func NewService(userRepo repository.UserRepository, keycloak *keycloak.KeycloakService, email *email.EmailService) Service {
+func NewService(userRepo repository.UserRepository, programRepo repository.ProgramRepository, keycloak *keycloak.KeycloakService, email *email.EmailService) Service {
 	return &teacherService{
-		userRepo: userRepo,
-		keycloak: keycloak,
-		email:    email,
+		userRepo:    userRepo,
+		programRepo: programRepo,
+		keycloak:    keycloak,
+		email:       email,
 	}
 }
 
@@ -116,8 +118,22 @@ func (s *teacherService) CreateTeacher(ctx context.Context, teacher *models.User
 			fmt.Printf("Warning: failed to create Keycloak user: %v\n", err)
 		} else {
 			// Assign role
-			if err := s.keycloak.AssignRole(ctx, keycloakID, "professor"); err != nil {
+			if err := s.keycloak.AssignRole(ctx, keycloakID, "teacher"); err != nil {
 				fmt.Printf("Warning: failed to assign role: %v\n", err)
+			}
+
+			// Dynamic Group Assignment
+			if len(teacher.ProgramIDs) > 0 {
+				programs, err := s.programRepo.FindByIDs(ctx, teacher.ProgramIDs)
+				if err != nil {
+					fmt.Printf("Warning: failed to fetch programs for group assignment: %v\n", err)
+				} else {
+					for _, p := range programs {
+						if err := s.keycloak.AddUserToGroup(ctx, keycloakID, p.Code); err != nil {
+							fmt.Printf("Warning: failed to add user to group '%s': %v\n", err)
+						}
+					}
+				}
 			}
 
 			// Set password

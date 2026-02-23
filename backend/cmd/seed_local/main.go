@@ -54,10 +54,10 @@ func runSeed(db *gorm.DB, passwordHash string) error {
 		}
 
 		// 1) Upsert usuários necessários para telas de admin/professor/aluno.
-		if err := upsertUser(tx, "Admin CECOR", "admin.cecor@cecor.org", "11111111101", "(11) 91111-1111", "admin", 1, passwordHash); err != nil {
+		if err := upsertUser(tx, "Admin CECOR", "admin.cecor@cecor.org", "11111111101", "(11) 91111-1111", "administrator", 1, passwordHash); err != nil {
 			return err
 		}
-		if err := upsertUser(tx, "Carlos Ferreira", "carlos.ferreira@cecor.org", "23456789100", "(11) 95432-1098", "professor", 2, passwordHash); err != nil {
+		if err := upsertUser(tx, "Carlos Ferreira", "carlos.ferreira@cecor.org", "23456789100", "(11) 95432-1098", "teacher", 2, passwordHash); err != nil {
 			return err
 		}
 		if err := upsertUser(tx, "Mariana Costa", "mariana.costa@cecor.org", "34567891200", "(11) 94321-0987", "professor", 2, passwordHash); err != nil {
@@ -84,13 +84,13 @@ func runSeed(db *gorm.DB, passwordHash string) error {
 		}
 
 		// 2) Garante catálogo de perfis em IDs fixos esperados pelo sistema atual.
-		if err := upsertProfile(tx, 1, adminID, "administrador", "admin", "Administrador"); err != nil {
+		if err := upsertProfile(tx, 1, adminID, "administrator", "admin", "Administrador"); err != nil {
 			return err
 		}
-		if err := upsertProfile(tx, 2, profID, "professor", "professor", "Professor"); err != nil {
+		if err := upsertProfile(tx, 2, profID, "teacher", "teacher", "Professor"); err != nil {
 			return err
 		}
-		if err := upsertProfile(tx, 3, studentID, "aluno", "aluno", "Aluno"); err != nil {
+		if err := upsertProfile(tx, 3, studentID, "student", "student", "Aluno"); err != nil {
 			return err
 		}
 

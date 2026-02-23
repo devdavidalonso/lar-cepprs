@@ -5,7 +5,7 @@ export const environment = {
   version: '1.0.0-dev',
   useMocks: true,
   ssoApiUrl: 'http://localhost:8081',
-  ssoIssuer: 'http://localhost:8081/realms/cecor',
-  ssoClientId: 'cecor-frontend',
+  ssoIssuer: 'http://localhost:8081/realms/cepprs',
+  ssoClientId: 'lar-cepprs-frontend',
   ssoRedirectUri: 'http://localhost:4201'
 };

@@ -31,12 +31,12 @@ import (
 	"github.com/devdavidalonso/cecor/backend/internal/service/courses"    // Adicionar importação de courses
 	"github.com/devdavidalonso/cecor/backend/internal/service/email"
 	"github.com/devdavidalonso/cecor/backend/internal/service/enrollments" // Adicionar importação de enrollments
-	"github.com/devdavidalonso/cecor/backend/internal/service/interviews"  // Import interviews service
+	"github.com/devdavidalonso/cecor/backend/internal/service/incidents"
+	"github.com/devdavidalonso/cecor/backend/internal/service/interviews" // Import interviews service
 	"github.com/devdavidalonso/cecor/backend/internal/service/keycloak"
 	"github.com/devdavidalonso/cecor/backend/internal/service/reports"  // Adicionar importação de reports
 	"github.com/devdavidalonso/cecor/backend/internal/service/students" // Adicionar importação de students
 	"github.com/devdavidalonso/cecor/backend/internal/service/teacherportal"
-	"github.com/devdavidalonso/cecor/backend/internal/service/incidents"
 	"github.com/devdavidalonso/cecor/backend/internal/service/teachers" // Adicionar importação de professors
 	"github.com/devdavidalonso/cecor/backend/internal/service/users"    // Adicionar esta importação
 	"github.com/devdavidalonso/cecor/backend/pkg/logger"
@@ -122,6 +122,7 @@ func main() {
 	enrollmentRepo := postgres.NewEnrollmentRepository(db) // Adicionar repositório de matrículas
 	attendanceRepo := postgres.NewAttendanceRepository(db) // Adicionar repositório de presenças
 	reportRepo := postgres.NewReportRepository(db)         // Adicionar repositório de relatórios
+	programRepo := postgres.NewProgramRepository(db)       // Adicionar repositório de programas
 
 	// Initialize Google Classroom Client
 	classroomClient, err := googleapis.NewGoogleClassroomClient("credentials.json")
@@ -133,37 +134,37 @@ func main() {
 	// Initialize services
 	keycloakService := keycloak.NewKeycloakService()                                                      // Inicializar keycloak service
 	emailService := email.NewEmailService()                                                               // Inicializar email service
-	studentService := students.NewStudentService(studentRepo, keycloakService, emailService)              // Inicializar student service com Keycloak e Email
+	studentService := students.NewStudentService(studentRepo, programRepo, keycloakService, emailService) // Inicializar student service com ProgramRepo
 	userService := users.NewUserService(userRepo)                                                         // Adicionar o serviço de usuários
-	teacherService := teachers.NewService(userRepo, keycloakService, emailService)                        // Adicionar serviço de teachers/
+	teacherService := teachers.NewService(userRepo, programRepo, keycloakService, emailService)           // Adicionar serviço de teachers com ProgramRepo
 	courseService := courses.NewService(courseRepo, classroomClient)                                      // Adicionar serviço de cursos
 	enrollmentService := enrollments.NewService(enrollmentRepo, studentRepo, courseRepo, classroomClient) // Updated with dependencies
 	attendanceService := attendance.NewService(attendanceRepo)                                            // Adicionar serviço de presenças
 	reportService := reports.NewService(reportRepo)                                                       // Adicionar serviço de relatórios
-	
+
 	// Initialize MongoDB repositories
 	formRepo := mongodb.NewFormRepository()
-	interviewService := interviews.NewService(formRepo)                                                   // Inicializar serviço de entrevistas
-	interviewAdminService := interviews.NewAdminService(formRepo)                                         // Inicializar serviço admin de entrevistas
+	interviewService := interviews.NewService(formRepo)           // Inicializar serviço de entrevistas
+	interviewAdminService := interviews.NewAdminService(formRepo) // Inicializar serviço admin de entrevistas
 
 	// Initialize SSO Config
 	ssoConfig := auth.NewSSOConfig(cfg)
 
 	// Initialize handlers
 	studentHandler := handlers.NewStudentHandler(studentService)
-	authHandler := handlers.NewAuthHandler(userService, cfg, ssoConfig)        // Adicionar o handler de autenticação
-	teacherHandler := handlers.NewTeacherHandler(teacherService)               // Adicionar handler de professores
-	courseHandler := handlers.NewCourseHandler(courseService, keycloakService) // Adicionar handler de cursos
+	authHandler := handlers.NewAuthHandler(userService, cfg, ssoConfig)                     // Adicionar o handler de autenticação
+	teacherHandler := handlers.NewTeacherHandler(teacherService)                            // Adicionar handler de professores
+	courseHandler := handlers.NewCourseHandler(courseService, keycloakService)              // Adicionar handler de cursos
 	enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentService, interviewService) // Adicionar handler de matrículas com entrevista
-	attendanceHandler := handlers.NewAttendanceHandler(attendanceService)      // Adicionar handler de presenças
-	reportHandler := handlers.NewReportHandler(reportService)                  // Adicionar handler de relatórios
-	interviewHandler := handlers.NewInterviewHandler(interviewService)         // Adicionar handler de entrevistas
-	interviewAdminHandler := handlers.NewInterviewAdminHandler(interviewAdminService) // Adicionar handler admin de entrevistas
-	
+	attendanceHandler := handlers.NewAttendanceHandler(attendanceService)                   // Adicionar handler de presenças
+	reportHandler := handlers.NewReportHandler(reportService)                               // Adicionar handler de relatórios
+	interviewHandler := handlers.NewInterviewHandler(interviewService)                      // Adicionar handler de entrevistas
+	interviewAdminHandler := handlers.NewInterviewAdminHandler(interviewAdminService)       // Adicionar handler admin de entrevistas
+
 	// Initialize teacher portal service and handler
 	teacherPortalService := teacherportal.NewService(db)
 	teacherPortalHandler := handlers.NewTeacherPortalHandler(teacherPortalService)
-	
+
 	// Initialize incident service and handler
 	incidentService := incidents.NewService(db)
 	incidentHandler := handlers.NewIncidentHandler(incidentService)

@@ -15,8 +15,8 @@ fi
 PROFILE="${SMOKE_PROFILE:-staging}"
 if [[ "${PROFILE}" == "production" ]]; then
   DEFAULT_BASE_URL="${PRODUCTION_BASE_URL:-http://localhost:8082}"
-  DEFAULT_TOKEN_URL="${PRODUCTION_KEYCLOAK_TOKEN_URL:-http://localhost:8081/realms/cecor/protocol/openid-connect/token}"
-  DEFAULT_CLIENT_ID="${PRODUCTION_KEYCLOAK_CLIENT_ID:-cecor-backend}"
+  DEFAULT_TOKEN_URL="${PRODUCTION_KEYCLOAK_TOKEN_URL:-http://localhost:8081/realms/cepprs/protocol/openid-connect/token}"
+  DEFAULT_CLIENT_ID="${PRODUCTION_KEYCLOAK_CLIENT_ID:-lar-cepprs-backend}"
   DEFAULT_CLIENT_SECRET="${PRODUCTION_KEYCLOAK_CLIENT_SECRET:-}"
   DEFAULT_ADMIN_USER="${PRODUCTION_ADMIN_USER:-admin.cecor}"
   DEFAULT_ADMIN_PASS="${PRODUCTION_ADMIN_PASS:-admin123}"
@@ -26,8 +26,8 @@ if [[ "${PROFILE}" == "production" ]]; then
   DEFAULT_STUDENT_PASS="${PRODUCTION_STUDENT_PASS:-aluno123}"
 else
   DEFAULT_BASE_URL="${STAGING_BASE_URL:-http://localhost:8082}"
-  DEFAULT_TOKEN_URL="${STAGING_KEYCLOAK_TOKEN_URL:-http://localhost:8081/realms/cecor/protocol/openid-connect/token}"
-  DEFAULT_CLIENT_ID="${STAGING_KEYCLOAK_CLIENT_ID:-cecor-backend}"
+  DEFAULT_TOKEN_URL="${STAGING_KEYCLOAK_TOKEN_URL:-http://localhost:8081/realms/cepprs/protocol/openid-connect/token}"
+  DEFAULT_CLIENT_ID="${STAGING_KEYCLOAK_CLIENT_ID:-lar-cepprs-backend}"
   DEFAULT_CLIENT_SECRET="${STAGING_KEYCLOAK_CLIENT_SECRET:-}"
   DEFAULT_ADMIN_USER="${STAGING_ADMIN_USER:-admin.cecor}"
   DEFAULT_ADMIN_PASS="${STAGING_ADMIN_PASS:-admin123}"

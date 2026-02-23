@@ -1,0 +1,206 @@
+{
+  "users": [
+    {
+      "createdTimestamp": 1770572876386,
+      "username": "admin.cecor",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "CECOR",
+      "email": "dev.david.garcia.alonso@gmail.com",
+      "attributes": {
+        "locale": [
+          "pt-BR"
+        ]
+      },
+      "credentials": [
+        {
+          "id": "8c5aaade-72b6-4a68-9d3d-b5dbe3135119",
+          "type": "password",
+          "createdDate": 1771770983670,
+          "secretData": "{\"value\":\"FzXJdAnQoStaNbplwp1LLQOcqSNdxHm5v2zjcaLLoJ8=\",\"salt\":\"TESiV/fGCRYwNP2sgvOjPQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "administrator"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "cecor-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "cecor-frontend",
+            "profile"
+          ],
+          "createdDate": 1771289452194,
+          "lastUpdatedDate": 1771289454389
+        }
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ]
+    },
+    {
+      "createdTimestamp": 1770573423104,
+      "username": "aluno.pedro",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Pedro",
+      "lastName": "Almeida",
+      "email": "pedro@cecor.test",
+      "credentials": [
+        {
+          "id": "46bf1f22-b480-47de-a5af-1838c80dfdf7",
+          "type": "password",
+          "createdDate": 1771770985712,
+          "secretData": "{\"value\":\"HQpZQH+b6WbfySTVUc4RrJIxjkNfrDkM64MyVx48KDI=\",\"salt\":\"c88gnQ3ta3MPNZvhm0PPhg==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "student"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "cecor-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "cecor-frontend",
+            "profile"
+          ],
+          "createdDate": 1771784406504,
+          "lastUpdatedDate": 1771784409270
+        }
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ]
+    },
+    {
+      "createdTimestamp": 1771792404042,
+      "username": "luno.homolog01@cecor.org",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Aluno",
+      "lastName": "Homologacao 01",
+      "email": "luno.homolog01@cecor.org",
+      "credentials": [
+        {
+          "id": "a418ff79-b141-4b57-897f-bd9e96932ab6",
+          "type": "password",
+          "createdDate": 1771792405965,
+          "secretData": "{\"value\":\"fr1inCiwDo3G9qc5IcBahQnv4gjFE5DcnZNnhfmhvsY=\",\"salt\":\"efHVuN6BxRZ8JiA84omuxQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "student"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ]
+    },
+    {
+      "createdTimestamp": 1771789877870,
+      "username": "prof.homolog01@cecor.org",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Professor",
+      "lastName": "Homologacao 01",
+      "email": "prof.homolog01@cecor.org",
+      "credentials": [
+        {
+          "id": "e2bc409e-8d18-4624-a7dc-32db83fb1d98",
+          "type": "password",
+          "createdDate": 1771789885944,
+          "secretData": "{\"value\":\"HcwWv2wRJ2ephqCyh5j6JWO3QhbnShzgKnq2W/xc6Qw=\",\"salt\":\"QrBN6f5MZ5gQft2jLL92Fw==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "teacher"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "cecor-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "cecor-frontend",
+            "profile"
+          ],
+          "createdDate": 1771793196609,
+          "lastUpdatedDate": 1771793197297
+        }
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ]
+    },
+    {
+      "createdTimestamp": 1770573259290,
+      "username": "prof.maria",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Maria",
+      "lastName": "Silva",
+      "email": "maria@cecor.test",
+      "credentials": [
+        {
+          "id": "4a2eba6b-5dac-4a4c-8451-54aea5a67400",
+          "type": "password",
+          "createdDate": 1771770985313,
+          "secretData": "{\"value\":\"zK61gA2cssAxNIu2JpqA9qBc0P2O37G85rIrpwsWt2g=\",\"salt\":\"lGOs6Aw1O0GeobaVzyNCXA==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "teacher"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "cecor-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "cecor-frontend",
+            "profile"
+          ],
+          "createdDate": 1771715010541,
+          "lastUpdatedDate": 1771715034994
+        }
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ]
+    }
+  ]
+}

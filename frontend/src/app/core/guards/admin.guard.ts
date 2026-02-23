@@ -10,7 +10,7 @@ export const AdminGuard: CanActivateFn = (route, state) => {
 
   const isAuthorized =
     authService.checkAuth() &&
-    (authService.hasRole('admin') || authService.hasRole('administrador') || authService.hasRole('gestor'));
+    (authService.hasRole('admin') || authService.hasRole('administrator') || authService.hasRole('administrador') || authService.hasRole('gestor'));
 
   if (isAuthorized) {
     return true;

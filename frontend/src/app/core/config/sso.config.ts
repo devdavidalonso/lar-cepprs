@@ -8,7 +8,7 @@ export const authCodeFlowConfig: AuthConfig = {
   redirectUri: window.location.origin,
 
   // ID do Cliente
-  clientId: 'ceco-frontend',
+  clientId: 'lar-cepprs-frontend',
 
   responseType: 'code',
   scope: 'openid profile email offline_access',

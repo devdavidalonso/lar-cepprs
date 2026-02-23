@@ -120,7 +120,7 @@ func (h *AuthHandler) SSOCallback(w http.ResponseWriter, r *http.Request) {
 		for _, r := range userInfo.RealmAccess.Roles {
 			normalized := normalizeRole(r)
 			switch normalized {
-			case "administrador", "admin", "gestor", "professor", "aluno", "responsável", "responsavel":
+			case "administrator", "admin", "gestor", "teacher", "professor", "student", "aluno", "responsável", "responsavel":
 				role = normalized
 			}
 			if role != "" {

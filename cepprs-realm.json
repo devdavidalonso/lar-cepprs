@@ -1,0 +1,35 @@
+{
+  "id": "cepprs",
+  "realm": "cepprs",
+  "enabled": true,
+  "displayName": "LAR CEPPRS",
+  "roles": {
+    "realm": [
+      { "name": "administrator", "description": "System Administrator" },
+      { "name": "teacher", "description": "Teacher/Professor" },
+      { "name": "student", "description": "Student" },
+      { "name": "maintenance", "description": "Maintenance/Support" }
+    ]
+  },
+  "groups": [{ "name": "seeds" }, { "name": "fly" }, { "name": "cecor" }],
+  "clients": [
+    {
+      "clientId": "lar-cepprs-frontend",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "webOrigins": ["*"],
+      "redirectUris": ["http://localhost:4201/*", "http://localhost:4200/*"]
+    },
+    {
+      "clientId": "lar-cepprs-backend",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "REPLACE_WITH_YOUR_SECRET",
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "redirectUris": ["http://localhost:8081/*"]
+    }
+  ]
+}

@@ -46,7 +46,7 @@ interface DashboardCard {
 
       <!-- Logo CECOR centralizado entre os cards -->
       <div class="cecor-logo-divider">
-        <img src="assets/images/cecor-logo.png" alt="CECOR" class="cecor-center-logo" />
+        <img src="assets/images/cecor-logo.png" alt="LAR-CEPPRS" class="cecor-center-logo" />
       </div>
       
       <div class="dashboard-grid">

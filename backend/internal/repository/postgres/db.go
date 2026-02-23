@@ -126,6 +126,7 @@ func MigrateDB(db *gorm.DB) error {
 		// System models
 		&models.Notification{},
 		&models.AuditLog{},
+		&models.AcademicCalendar{},
 	}
 
 	// Migrar cada modelo individualmente
@@ -138,6 +139,10 @@ func MigrateDB(db *gorm.DB) error {
 
 	if err := ensureDefaultPrograms(db); err != nil {
 		log.Printf("Warning: error ensuring default programs: %v", err)
+	}
+
+	if err := ensureAcademicCalendar2026(db); err != nil {
+		log.Printf("Warning: error ensuring academic calendar 2026: %v", err)
 	}
 
 	if err := backfillTeacherPrograms(db); err != nil {
@@ -257,4 +262,31 @@ func backfillTeacherPrograms(db *gorm.DB) error {
 		  AND tc.teacher_id IS NOT NULL
 		ON CONFLICT (teacher_id, program_id) DO NOTHING;
 	`).Error
+}
+
+func ensureAcademicCalendar2026(db *gorm.DB) error {
+	// CECOR 2026 Calendar Recesses
+	recesses := []models.AcademicCalendar{
+		{Name: "Recesso Carnaval", StartDate: time.Date(2026, 2, 14, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 2, 18, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Reunião de Voluntários LAMN", StartDate: time.Date(2026, 2, 28, 13, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 2, 28, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Paixão de Cristo (Páscoa)", StartDate: time.Date(2026, 4, 2, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 4, 4, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Tiradentes", StartDate: time.Date(2026, 4, 18, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 4, 18, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Tiradentes", StartDate: time.Date(2026, 4, 22, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 4, 22, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Dia do Trabalho", StartDate: time.Date(2026, 4, 30, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 5, 2, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Corpus Christi", StartDate: time.Date(2026, 6, 3, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 6, 6, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Independência do Brasil", StartDate: time.Date(2026, 9, 5, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 9, 5, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Nossa Sra Aparecida", StartDate: time.Date(2026, 10, 10, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 10, 10, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Finados", StartDate: time.Date(2026, 10, 31, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 10, 31, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Proclamação da República", StartDate: time.Date(2026, 11, 14, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 11, 15, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Recesso Consciência Negra", StartDate: time.Date(2026, 11, 19, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 11, 21, 23, 59, 59, 0, time.UTC), Type: "recess"},
+		{Name: "Férias", StartDate: time.Date(2026, 11, 30, 0, 0, 0, 0, time.UTC), EndDate: time.Date(2026, 12, 31, 23, 59, 59, 0, time.UTC), Type: "recess"},
+	}
+
+	for _, r := range recesses {
+		if err := db.Where("name = ? AND start_date = ?", r.Name, r.StartDate).FirstOrCreate(&r).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

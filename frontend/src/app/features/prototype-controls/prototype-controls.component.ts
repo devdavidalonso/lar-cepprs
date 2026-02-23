@@ -64,10 +64,9 @@ import { PrototypeService } from '../../core/services/prototype/prototype.servic
           <div class="control-section">
             <h3>Simular Perfil</h3>
             <mat-select [(ngModel)]="selectedUserProfile" placeholder="Selecione um perfil">
-              <mat-option value="admin">Administrador</mat-option>
-              <mat-option value="gestor">Gestor</mat-option>
-              <mat-option value="professor">Professor</mat-option>
-              <mat-option value="aluno">Aluno</mat-option>
+              <mat-option value="admin">Administrator</mat-option>
+              <mat-option value="teacher">Teacher</mat-option>
+              <mat-option value="student">Student</mat-option>
               <mat-option value="visitante">Visitante</mat-option>
             </mat-select>
             <p class="control-description">Simula diferentes níveis de acesso</p>

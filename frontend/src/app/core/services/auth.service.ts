@@ -51,9 +51,9 @@ export class AuthService {
   }
 
   private mapRolesToProfileId(roles: string[]): number {
-    if (roles.includes('administrador') || roles.includes('admin') || roles.includes('gestor')) return 1; // admin
-    if (roles.includes('professor')) return 2; // professor
-    if (roles.includes('aluno') || roles.includes('responsavel') || roles.includes('responsável')) return 3; // student
+    if (roles.includes('administrator') || roles.includes('admin') || roles.includes('administrador') || roles.includes('gestor')) return 1; // admin
+    if (roles.includes('teacher') || roles.includes('professor')) return 2; // professor
+    if (roles.includes('student') || roles.includes('aluno') || roles.includes('responsavel') || roles.includes('responsável')) return 3; // student
     return 3; // default to student
   }
 
@@ -95,13 +95,13 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (!user) return '/auth/login';
 
-    if (this.hasAnyRole(['admin', 'administrador', 'gestor'])) {
+    if (this.hasAnyRole(['admin', 'administrator', 'administrador', 'gestor'])) {
       return '/dashboard';
     }
-    if (this.hasAnyRole(['professor'])) {
+    if (this.hasAnyRole(['teacher', 'professor'])) {
       return '/teacher/dashboard';
     }
-    if (this.hasAnyRole(['aluno', 'responsavel', 'responsável'])) {
+    if (this.hasAnyRole(['student', 'aluno', 'responsavel', 'responsável'])) {
       return '/student/dashboard';
     }
 

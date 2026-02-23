@@ -3,7 +3,7 @@
  */
 export interface UserProfile {
   id: number;
-  name: 'admin' | 'professor' | 'student';
+  name: 'administrator' | 'teacher' | 'student' | 'admin' | 'professor';
   description: string;
 }
 
@@ -35,9 +35,9 @@ export const USER_PROFILES = {
 export function getProfileName(profileId: number): string {
   switch (profileId) {
     case USER_PROFILES.ADMIN:
-      return 'admin';
+      return 'administrator';
     case USER_PROFILES.PROFESSOR:
-      return 'professor';
+      return 'teacher';
     case USER_PROFILES.STUDENT:
       return 'student';
     default:

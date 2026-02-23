@@ -11,7 +11,7 @@ ctx := context.Background()
 token, err := client.LoginAdmin(ctx, "admin", "pigu@1025", "master")
 if err != nil { log.Fatal(err) }
 
-realm := "cecor"
+realm := "cepprs"
 
 // Test sem.responsavel
 e1 := "sem.responsavel@teste.com"

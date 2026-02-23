@@ -234,13 +234,13 @@ func (s *userService) FindOrCreateByEmail(ctx context.Context, email, name, prof
 	// Map Keycloak profiles to local profile IDs
 	var localProfileID uint
 	switch strings.ToLower(strings.TrimSpace(profile)) {
-	case "administrador", "admin":
+	case "administrator", "admin":
 		localProfileID = ProfileAdmin
 	case "gestor":
 		localProfileID = ProfileAdmin // Manager treated as admin for now
-	case "professor":
+	case "teacher", "professor":
 		localProfileID = ProfileProfessor
-	case "aluno":
+	case "student", "aluno":
 		localProfileID = ProfileStudent
 	case "responsável", "responsavel":
 		localProfileID = ProfileStudent // Guardian treated as student for now

@@ -38,9 +38,9 @@ export class StudentGuard implements CanActivate {
           console.log('[StudentGuard] Usuário não é aluno, redirecionando');
           
           // Redirecionar para o portal correto baseado no perfil
-          if (user.profileId === USER_PROFILES.ADMIN || user.profile?.name === 'admin') {
+          if (user.profileId === USER_PROFILES.ADMIN || user.profile?.name === 'admin' || user.profile?.name === 'administrator') {
             this.router.navigate(['/admin/dashboard']);
-          } else if (user.profileId === USER_PROFILES.PROFESSOR || user.profile?.name === 'professor') {
+          } else if (user.profileId === USER_PROFILES.PROFESSOR || user.profile?.name === 'professor' || user.profile?.name === 'teacher') {
             this.router.navigate(['/teacher/dashboard']);
           } else {
             this.router.navigate(['/']);
@@ -74,9 +74,9 @@ export const studentGuard = () => {
                        user.profile?.name === 'student';
       
       if (!isStudent) {
-        if (user.profileId === USER_PROFILES.ADMIN || user.profile?.name === 'admin') {
+        if (user.profileId === USER_PROFILES.ADMIN || user.profile?.name === 'admin' || user.profile?.name === 'administrator') {
           router.navigate(['/admin/dashboard']);
-        } else if (user.profileId === USER_PROFILES.PROFESSOR || user.profile?.name === 'professor') {
+        } else if (user.profileId === USER_PROFILES.PROFESSOR || user.profile?.name === 'professor' || user.profile?.name === 'teacher') {
           router.navigate(['/teacher/dashboard']);
         } else {
           router.navigate(['/']);

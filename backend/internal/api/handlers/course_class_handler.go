@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/devdavidalonso/cecor/backend/internal/models"
@@ -26,9 +27,9 @@ func NewCourseClassHandler(db *gorm.DB) *CourseClassHandler {
 // GET /api/v1/course-classes
 func (h *CourseClassHandler) ListCourseClasses(w http.ResponseWriter, r *http.Request) {
 	var classes []models.CourseClass
-	
+
 	query := h.db.Preload("Course").Preload("DefaultTeacher.User").Preload("DefaultLocation")
-	
+
 	// Filtros opcionais
 	if courseID := r.URL.Query().Get("courseId"); courseID != "" {
 		query = query.Where("course_id = ?", courseID)
@@ -36,7 +37,7 @@ func (h *CourseClassHandler) ListCourseClasses(w http.ResponseWriter, r *http.Re
 	if status := r.URL.Query().Get("status"); status != "" {
 		query = query.Where("status = ?", status)
 	}
-	
+
 	if err := query.Find(&classes).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -226,6 +227,93 @@ func (h *CourseClassHandler) GetCourseClassStudents(w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(enrollments)
 }
 
+// GenerateSessions gera as aulas para uma turma baseada no cronograma
+// POST /api/v1/course-classes/:id/generate-sessions
+func (h *CourseClassHandler) GenerateSessions(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseUint(chi.URLParam(r, "id"), 10, 32)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var class models.CourseClass
+	if err := h.db.First(&class, id).Error; err != nil {
+		http.Error(w, "class not found", http.StatusNotFound)
+		return
+	}
+
+	// 1. Limpar sessões existentes (opcional, ou apenas adicionar as que faltam)
+	// Para este caso, vamos apenas adicionar as que não existem ou limpar e gerar tudo.
+	// Vamos limpar e gerar para garantir consistência com o novo cronograma.
+	if err := h.db.Where("course_class_id = ?", class.ID).Delete(&models.ClassSession{}).Error; err != nil {
+		http.Error(w, "error clearing old sessions: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// 2. Buscar recessos para o programa (ou gerais)
+	var recesses []models.AcademicCalendar
+	if err := h.db.Where("type = 'recess' AND is_active = true").
+		Where("(program_id IS NULL OR program_id = (SELECT program_id FROM courses WHERE id = ?))", class.CourseID).
+		Find(&recesses).Error; err != nil {
+		http.Error(w, "error fetching academic calendar: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// 3. Parsar dias da semana (ex: "1,3,5")
+	weekDaysMap := make(map[time.Weekday]bool)
+	for _, d := range strings.Split(class.WeekDays, ",") {
+		day, _ := strconv.Atoi(strings.TrimSpace(d))
+		weekDaysMap[time.Weekday(day)] = true
+	}
+
+	// 4. Gerar sessões
+	var sessions []models.ClassSession
+	current := class.StartDate
+	for !current.After(class.EndDate) {
+		// Verificar se o dia da semana coincide
+		if weekDaysMap[current.Weekday()] {
+			// Verificar se é recesso
+			isRecess := false
+			for _, recess := range recesses {
+				// Normalizar datas para comparação apenas de dia/mês/ano se necessário
+				// Aqui usamos o intervalo [StartDate, EndDate] do recesso
+				if !current.Before(recess.StartDate) && !current.After(recess.EndDate) {
+					isRecess = true
+					break
+				}
+			}
+
+			if !isRecess {
+				session := models.ClassSession{
+					CourseID:      class.CourseID,
+					CourseClassID: &class.ID,
+					Date:          current,
+					StartTime:     class.StartTime,
+					EndTime:       class.EndTime,
+					LocationID:    class.DefaultLocationID,
+					TeacherID:     class.DefaultTeacherID,
+				}
+				sessions = append(sessions, session)
+			}
+		}
+		current = current.AddDate(0, 0, 1)
+	}
+
+	if len(sessions) > 0 {
+		if err := h.db.Create(&sessions).Error; err != nil {
+			http.Error(w, "error creating sessions: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message":       "sessions generated successfully",
+		"sessionsCount": len(sessions),
+		"sessions":      sessions,
+	})
+}
+
 // RegisterRoutes registra as rotas de turmas
 func (h *CourseClassHandler) RegisterRoutes(r chi.Router) {
 	r.Route("/course-classes", func(r chi.Router) {
@@ -234,5 +322,6 @@ func (h *CourseClassHandler) RegisterRoutes(r chi.Router) {
 		r.Get("/{id}", h.GetCourseClass)
 		r.Put("/{id}", h.UpdateCourseClass)
 		r.Get("/{id}/students", h.GetCourseClassStudents)
+		r.Post("/{id}/generate-sessions", h.GenerateSessions)
 	})
 }

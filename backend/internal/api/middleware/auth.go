@@ -128,7 +128,7 @@ func RequireAdmin(next http.Handler) http.Handler {
 		isAdmin := false
 		for _, role := range claims.Roles {
 			normalizedRole := strings.ToLower(strings.TrimSpace(role))
-			if normalizedRole == "admin" || normalizedRole == "administrador" || normalizedRole == "gestor" {
+			if normalizedRole == "admin" || normalizedRole == "administrator" || normalizedRole == "administrador" || normalizedRole == "gestor" {
 				isAdmin = true
 				break
 			}

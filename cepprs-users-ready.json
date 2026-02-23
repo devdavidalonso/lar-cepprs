@@ -1,0 +1,219 @@
+{
+  "users": [
+    {
+      "id": "393014cf-3e53-41c3-b747-e1bbd963deb6",
+      "createdTimestamp": 1770572876386,
+      "username": "admin.cecor",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "CECOR",
+      "email": "dev.david.garcia.alonso@gmail.com",
+      "attributes": {
+        "locale": [
+          "pt-BR"
+        ]
+      },
+      "credentials": [
+        {
+          "id": "1353ab2f-68e4-44f0-9633-7646d216fd8b",
+          "type": "password",
+          "createdDate": 1771770983670,
+          "secretData": "{\"value\":\"FzXJdAnQoStaNbplwp1LLQOcqSNdxHm5v2zjcaLLoJ8=\",\"salt\":\"TESiV/fGCRYwNP2sgvOjPQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "administrator"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "lar-cepprs-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "profile"
+          ],
+          "createdDate": 1771858914142,
+          "lastUpdatedDate": 1771858914142
+        }
+      ]
+    },
+    {
+      "id": "e3a71402-ca48-44f6-a466-fd17109685ed",
+      "createdTimestamp": 1770573423104,
+      "username": "aluno.pedro",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Pedro",
+      "lastName": "Almeida",
+      "email": "pedro@cecor.test",
+      "credentials": [
+        {
+          "id": "53bf6c0e-f2dc-4055-b081-c5dfb135ebaa",
+          "type": "password",
+          "createdDate": 1771770985712,
+          "secretData": "{\"value\":\"HQpZQH+b6WbfySTVUc4RrJIxjkNfrDkM64MyVx48KDI=\",\"salt\":\"c88gnQ3ta3MPNZvhm0PPhg==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "student"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "lar-cepprs-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "profile"
+          ],
+          "createdDate": 1771858914142,
+          "lastUpdatedDate": 1771858914142
+        }
+      ]
+    },
+    {
+      "id": "043da383-1780-4276-8b10-a975196c7b21",
+      "createdTimestamp": 1771792404042,
+      "username": "luno.homolog01@cecor.org",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Aluno",
+      "lastName": "Homologacao 01",
+      "email": "luno.homolog01@cecor.org",
+      "credentials": [
+        {
+          "id": "28efdb37-81d6-45d2-aeea-ea6a09b468c8",
+          "type": "password",
+          "createdDate": 1771792405965,
+          "secretData": "{\"value\":\"fr1inCiwDo3G9qc5IcBahQnv4gjFE5DcnZNnhfmhvsY=\",\"salt\":\"efHVuN6BxRZ8JiA84omuxQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "student"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "lar-cepprs-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "profile"
+          ],
+          "createdDate": 1771858914142,
+          "lastUpdatedDate": 1771858914142
+        }
+      ]
+    },
+    {
+      "id": "40e1d9ab-f3bf-491a-a9f2-41eeeb5e0c3c",
+      "createdTimestamp": 1771789877870,
+      "username": "prof.homolog01@cecor.org",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Professor",
+      "lastName": "Homologacao 01",
+      "email": "prof.homolog01@cecor.org",
+      "credentials": [
+        {
+          "id": "161ee910-4901-4d83-bc6b-d978cf9bb9a8",
+          "type": "password",
+          "createdDate": 1771789885944,
+          "secretData": "{\"value\":\"HcwWv2wRJ2ephqCyh5j6JWO3QhbnShzgKnq2W/xc6Qw=\",\"salt\":\"QrBN6f5MZ5gQft2jLL92Fw==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "teacher"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "lar-cepprs-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "profile"
+          ],
+          "createdDate": 1771858914142,
+          "lastUpdatedDate": 1771858914142
+        }
+      ]
+    },
+    {
+      "id": "212af975-1f74-4a93-ba82-fb2ce5c0303c",
+      "createdTimestamp": 1770573259290,
+      "username": "prof.maria",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Maria",
+      "lastName": "Silva",
+      "email": "maria@cecor.test",
+      "credentials": [
+        {
+          "id": "d68c56ba-1637-4a26-8877-a5ba67a45683",
+          "type": "password",
+          "createdDate": 1771770985313,
+          "secretData": "{\"value\":\"zK61gA2cssAxNIu2JpqA9qBc0P2O37G85rIrpwsWt2g=\",\"salt\":\"lGOs6Aw1O0GeobaVzyNCXA==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-cepprs",
+        "teacher"
+      ],
+      "notBefore": 0,
+      "groups": [
+        "/cecor"
+      ],
+      "clientConsents": [
+        {
+          "clientId": "lar-cepprs-frontend",
+          "grantedClientScopes": [
+            "roles",
+            "email",
+            "profile"
+          ],
+          "createdDate": 1771858914142,
+          "lastUpdatedDate": 1771858914142
+        }
+      ]
+    }
+  ]
+}

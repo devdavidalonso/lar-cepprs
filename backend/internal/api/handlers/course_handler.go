@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/devdavidalonso/cecor/backend/internal/models"
-	"github.com/devdavidalonso/cecor/backend/internal/service/keycloak"
 	"github.com/devdavidalonso/cecor/backend/internal/service/courses"
+	"github.com/devdavidalonso/cecor/backend/internal/service/keycloak"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -111,7 +111,7 @@ func (h *CourseHandler) DeleteCourse(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CourseHandler) ListProfessors(w http.ResponseWriter, r *http.Request) {
-	professors, err := h.keycloakService.GetUsersByRole(r.Context(), "professor")
+	professors, err := h.keycloakService.GetUsersByRole(r.Context(), "teacher")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

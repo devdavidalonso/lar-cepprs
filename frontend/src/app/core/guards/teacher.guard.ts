@@ -9,7 +9,7 @@ export const TeacherGuard: CanActivateFn = (route, state) => {
 
   const isTeacherOrAdmin =
     authService.checkAuth() &&
-    (authService.hasRole('professor') || authService.hasRole('admin') || authService.hasRole('administrador'));
+    (authService.hasRole('teacher') || authService.hasRole('professor') || authService.hasRole('admin') || authService.hasRole('administrator') || authService.hasRole('administrador'));
 
   if (isTeacherOrAdmin) {
     return true;

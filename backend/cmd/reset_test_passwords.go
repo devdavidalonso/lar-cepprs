@@ -13,7 +13,7 @@ func main() {
 	client := gocloak.NewClient(baseURL)
 	ctx := context.Background()
 
-	realm := "cecor"
+	realm := "cepprs"
 	adminRealm := "master"
 	username := "admin"
 	password := "pigu@1025"

@@ -203,3 +203,39 @@ func (s *KeycloakService) GetUsersByRole(ctx context.Context, roleName string) (
 
 	return users, nil
 }
+
+// AddUserToGroup adds a user to a Keycloak group
+func (s *KeycloakService) AddUserToGroup(ctx context.Context, userID, groupName string) error {
+	// Authenticate first
+	if err := s.authenticate(ctx); err != nil {
+		return err
+	}
+
+	// Get groups to find the ID of the group with the given name
+	groups, err := s.client.GetGroups(ctx, s.accessToken, s.realm, gocloak.GetGroupsParams{
+		Search: gocloak.StringP(groupName),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to search for group '%s': %w", groupName, err)
+	}
+
+	var groupID string
+	for _, g := range groups {
+		if g.Name != nil && *g.Name == groupName {
+			groupID = *g.ID
+			break
+		}
+	}
+
+	if groupID == "" {
+		return fmt.Errorf("group '%s' not found", groupName)
+	}
+
+	// Add user to group
+	err = s.client.AddUserToGroup(ctx, s.accessToken, s.realm, userID, groupID)
+	if err != nil {
+		return fmt.Errorf("failed to add user to group '%s': %w", groupName, err)
+	}
+
+	return nil
+}

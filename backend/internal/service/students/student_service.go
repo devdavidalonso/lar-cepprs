@@ -14,14 +14,16 @@ import (
 // studentService implements the Service interface
 type studentService struct {
 	studentRepo repository.StudentRepository
+	programRepo repository.ProgramRepository
 	keycloak    *keycloak.KeycloakService
 	email       *email.EmailService
 }
 
 // NewStudentService creates a new instance of studentService
-func NewStudentService(studentRepo repository.StudentRepository, keycloak *keycloak.KeycloakService, email *email.EmailService) Service {
+func NewStudentService(studentRepo repository.StudentRepository, programRepo repository.ProgramRepository, keycloak *keycloak.KeycloakService, email *email.EmailService) Service {
 	return &studentService{
 		studentRepo: studentRepo,
+		programRepo: programRepo,
 		keycloak:    keycloak,
 		email:       email,
 	}
@@ -188,9 +190,23 @@ func (s *studentService) CreateStudent(ctx context.Context, student *models.Stud
 			return nil
 		}
 
-		// Assign "aluno" role
-		if err := s.keycloak.AssignRole(ctx, keycloakUserID, "aluno"); err != nil {
+		// Assign "student" role
+		if err := s.keycloak.AssignRole(ctx, keycloakUserID, "student"); err != nil {
 			fmt.Printf("Warning: failed to assign role to Keycloak user: %v\n", err)
+		}
+
+		// Dynamic Group Assignment
+		if len(student.ProgramIDs) > 0 {
+			programs, err := s.programRepo.FindByIDs(ctx, student.ProgramIDs)
+			if err != nil {
+				fmt.Printf("Warning: failed to fetch programs for group assignment: %v\n", err)
+			} else {
+				for _, p := range programs {
+					if err := s.keycloak.AddUserToGroup(ctx, keycloakUserID, p.Code); err != nil {
+						fmt.Printf("Warning: failed to add user to group '%s': %v\n", err)
+					}
+				}
+			}
 		}
 
 		// Set temporary password
