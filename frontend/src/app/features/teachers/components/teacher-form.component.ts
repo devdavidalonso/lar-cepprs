@@ -16,6 +16,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TeacherService } from '../../../core/services/teacher.service';
 import { Teacher, UserContact } from '../../../core/models/teacher.model';
+import { ProgramService } from '../../../core/services/program.service';
+import { Program } from '../../../core/models/program.model';
 
 export const BRAZILIAN_DATE_FORMATS = {
   parse: {
@@ -147,6 +149,19 @@ export const BRAZILIAN_DATE_FORMATS = {
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Bio</mat-label>
                     <textarea matInput formControlName="bio" rows="3" placeholder="Brief teacher biography..."></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Programas</mat-label>
+                    <mat-select formControlName="programIds" multiple>
+                      <mat-option *ngFor="let program of programs" [value]="program.id">
+                        {{ program.name }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint>Selecione um ou mais programas de atuação.</mat-hint>
+                    <mat-error *ngIf="qualificationsForm.get('programIds')?.hasError('required')">
+                      Selecione pelo menos um programa.
+                    </mat-error>
                   </mat-form-field>
                 </div>
 
@@ -300,6 +315,7 @@ export const BRAZILIAN_DATE_FORMATS = {
                     <hr>
                     <p><strong>Specialization:</strong> {{ qualificationsForm.get('specialization')?.value || 'Not provided' }}</p>
                     <p><strong>Bio:</strong> {{ qualificationsForm.get('bio')?.value || 'Not provided' }}</p>
+                    <p><strong>Programas:</strong> {{ getProgramNames(qualificationsForm.get('programIds')?.value) }}</p>
                     <hr>
                     <p><strong>Address:</strong> {{ addressForm.get('street')?.value }}, {{ addressForm.get('number')?.value }} - {{ addressForm.get('city')?.value }}/{{ addressForm.get('state')?.value | uppercase }}</p>
                     <hr>
@@ -409,6 +425,7 @@ export class TeacherFormComponent implements OnInit {
   qualificationsForm: FormGroup;
   contactsForm: FormGroup;
   addressForm: FormGroup;
+  programs: Program[] = [];
   
   isSubmitting = false;
   isEditMode = false;
@@ -417,6 +434,7 @@ export class TeacherFormComponent implements OnInit {
   constructor(
     private _formBuilder: FormBuilder,
     private teacherService: TeacherService,
+    private programService: ProgramService,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
@@ -432,7 +450,8 @@ export class TeacherFormComponent implements OnInit {
 
     this.qualificationsForm = this._formBuilder.group({
       specialization: [''],
-      bio: ['']
+      bio: [''],
+      programIds: [[], Validators.required]
     });
 
     this.addressForm = this._formBuilder.group({
@@ -451,7 +470,20 @@ export class TeacherFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPrograms();
     this.checkEditMode();
+  }
+
+  loadPrograms(): void {
+    this.programService.listPrograms(true).subscribe({
+      next: (programs) => {
+        this.programs = programs;
+      },
+      error: (err) => {
+        console.error('Error loading programs', err);
+        this.snackBar.open('Falha ao carregar programas.', 'Fechar', { duration: 3000 });
+      }
+    });
   }
 
   get contactsArray(): FormArray {
@@ -502,7 +534,8 @@ export class TeacherFormComponent implements OnInit {
 
         this.qualificationsForm.patchValue({
           specialization: teacher.specialization,
-          bio: teacher.bio
+          bio: teacher.bio,
+          programIds: teacher.programIds || []
         });
         
         // Ensure email isn't easily changed if coming from Keycloak sync, but leave it as is for MVP unless locked 
@@ -627,5 +660,17 @@ export class TeacherFormComponent implements OnInit {
       this.contactsForm.markAllAsTouched();
       this.snackBar.open('Please fill all required fields correctly.', 'Close', { duration: 3000 });
     }
+  }
+
+  getProgramNames(ids: number[] | undefined): string {
+    if (!ids || ids.length === 0) {
+      return 'Nenhum programa selecionado';
+    }
+
+    const names = this.programs
+      .filter((program) => ids.includes(program.id))
+      .map((program) => program.name);
+
+    return names.length > 0 ? names.join(', ') : 'Nenhum programa selecionado';
   }
 }

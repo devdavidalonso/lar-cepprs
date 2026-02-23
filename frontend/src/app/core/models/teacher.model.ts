@@ -31,6 +31,7 @@ export interface Teacher {
   specialization?: string;
   bio?: string;
   linkedinUrl?: string; // from Phase 2 database changes
+  programIds?: number[];
   active?: boolean;
   address?: Address;
   userContacts?: UserContact[]; // Emergency contacts

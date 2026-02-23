@@ -64,6 +64,23 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 		return fmt.Errorf("error creating professor in database: %w", err)
 	}
 
+	if err := s.userRepo.UpsertTeacherProfile(
+		ctx,
+		professor.ID,
+		professor.Specialization,
+		professor.Bio,
+		professor.Phone,
+		professor.Active,
+	); err != nil {
+		return fmt.Errorf("error creating teacher profile metadata: %w", err)
+	}
+
+	if professor.ProgramIDs != nil {
+		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, professor.ID, professor.ProgramIDs); err != nil {
+			return fmt.Errorf("error linking teacher to programs: %w", err)
+		}
+	}
+
 	// Create in Keycloak
 	if s.keycloak != nil {
 		// Generate temporary password
@@ -117,7 +134,18 @@ func (s *professorService) CreateProfessor(ctx context.Context, professor *model
 
 // GetProfessors returns all professors
 func (s *professorService) GetProfessors(ctx context.Context) ([]models.User, error) {
-	return s.userRepo.FindByProfileID(ctx, 2)
+	professors, err := s.userRepo.FindByProfileID(ctx, 2)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range professors {
+		if err := s.hydrateTeacherMetadata(ctx, &professors[i]); err != nil {
+			return nil, err
+		}
+	}
+
+	return professors, nil
 }
 
 // GetProfessorByID returns a professor by ID
@@ -133,6 +161,9 @@ func (s *professorService) GetProfessorByID(ctx context.Context, id uint) (*mode
 	if user.ProfileID != 2 {
 		return nil, fmt.Errorf("user is not a professor")
 	}
+	if err := s.hydrateTeacherMetadata(ctx, user); err != nil {
+		return nil, err
+	}
 	return user, nil
 }
 
@@ -147,12 +178,37 @@ func (s *professorService) UpdateProfessor(ctx context.Context, professor *model
 	existing.Name = professor.Name
 	existing.Phone = professor.Phone
 	existing.CPF = professor.CPF
+	existing.Specialization = professor.Specialization
+	existing.Bio = professor.Bio
+	existing.LinkedinURL = professor.LinkedinURL
+	existing.ProgramIDs = professor.ProgramIDs
 
 	// Include associations payload
 	existing.Address = professor.Address
 	existing.UserContacts = professor.UserContacts
 
-	return s.userRepo.UpdateWithAssociations(ctx, existing)
+	if err := s.userRepo.UpdateWithAssociations(ctx, existing); err != nil {
+		return err
+	}
+
+	if err := s.userRepo.UpsertTeacherProfile(
+		ctx,
+		existing.ID,
+		existing.Specialization,
+		existing.Bio,
+		existing.Phone,
+		existing.Active,
+	); err != nil {
+		return fmt.Errorf("error updating teacher profile metadata: %w", err)
+	}
+
+	if professor.ProgramIDs != nil {
+		if err := s.userRepo.ReplaceTeacherProgramsByUserID(ctx, existing.ID, professor.ProgramIDs); err != nil {
+			return fmt.Errorf("error updating teacher programs: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // DeleteProfessor deletes a professor
@@ -166,4 +222,27 @@ func (s *professorService) DeleteProfessor(ctx context.Context, id uint) error {
 	// Disable in Keycloak if needed (omitted for brevity)
 
 	return s.userRepo.Delete(ctx, id)
+}
+
+func (s *professorService) hydrateTeacherMetadata(ctx context.Context, user *models.User) error {
+	teacherProfile, err := s.userRepo.GetTeacherProfileByUserID(ctx, user.ID)
+	if err != nil {
+		return fmt.Errorf("error loading teacher profile metadata: %w", err)
+	}
+	if teacherProfile != nil {
+		user.Specialization = teacherProfile.Specialization
+		user.Bio = teacherProfile.Bio
+		if user.Phone == "" {
+			user.Phone = teacherProfile.Phone
+		}
+		user.Active = teacherProfile.Active
+	}
+
+	programIDs, err := s.userRepo.GetTeacherProgramIDsByUserID(ctx, user.ID)
+	if err != nil {
+		return fmt.Errorf("error loading teacher program links: %w", err)
+	}
+	user.ProgramIDs = programIDs
+
+	return nil
 }

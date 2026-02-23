@@ -29,6 +29,7 @@ type Student struct {
 	CreatedAt          time.Time     `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt          time.Time     `json:"updatedAt" gorm:"autoUpdateTime"`
 	DeletedAt          *time.Time    `json:"deletedAt" gorm:"index"`
+	ProgramIDs         []uint        `json:"programIds,omitempty" gorm:"-"`
 
 	// Associations
 	User         User          `json:"user,omitempty" gorm:"foreignKey:UserID"`
@@ -37,6 +38,7 @@ type Student struct {
 	Documents    []Document    `json:"documents,omitempty" gorm:"foreignKey:StudentID"`
 	StudentNotes []StudentNote `json:"studentNotes,omitempty" gorm:"foreignKey:StudentID"`
 	Enrollments  []Enrollment  `json:"enrollments,omitempty" gorm:"foreignKey:StudentID"`
+	Programs     []StudentProgram `json:"programs,omitempty" gorm:"foreignKey:StudentID"`
 }
 
 // TableName defines the table name in the database

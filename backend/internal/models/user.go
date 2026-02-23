@@ -25,6 +25,12 @@ type User struct {
 	UpdatedAt       time.Time  `json:"updatedAt" gorm:"autoUpdateTime"`
 	DeletedAt       *time.Time `json:"deletedAt" gorm:"index"`
 
+	// Transient fields used by teacher/admin flows (not persisted in users table)
+	Specialization string `json:"specialization,omitempty" gorm:"-"`
+	Bio            string `json:"bio,omitempty" gorm:"-"`
+	LinkedinURL    string `json:"linkedinUrl,omitempty" gorm:"-"`
+	ProgramIDs     []uint `json:"programIds,omitempty" gorm:"-"`
+
 	// Associations
 	Profile      UserProfile   `json:"profile,omitempty" gorm:"foreignKey:ProfileID"`
 	UserContacts []UserContact `json:"userContacts,omitempty" gorm:"foreignKey:UserID"`

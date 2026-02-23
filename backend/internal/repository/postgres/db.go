@@ -70,6 +70,11 @@ func MigrateDB(db *gorm.DB) error {
 
 	// Lista de todos os modelos para migração
 	models := []interface{}{
+		// Multi-program related models
+		&models.EducationalCenter{},
+		&models.Program{},
+		&models.TeacherProgram{},
+
 		// User related models
 		&models.User{},
 		&models.UserProfile{},
@@ -78,6 +83,7 @@ func MigrateDB(db *gorm.DB) error {
 
 		// Student related models
 		&models.Student{},
+		&models.StudentProgram{},
 		&models.Guardian{},
 		&models.GuardianPermissions{},
 		&models.StudentNote{},
@@ -128,6 +134,14 @@ func MigrateDB(db *gorm.DB) error {
 			log.Printf("Warning: error migrating %T: %v", model, err)
 			// Continua com o próximo modelo, não interrompe a migração
 		}
+	}
+
+	if err := ensureDefaultPrograms(db); err != nil {
+		log.Printf("Warning: error ensuring default programs: %v", err)
+	}
+
+	if err := backfillTeacherPrograms(db); err != nil {
+		log.Printf("Warning: error backfilling teacher programs: %v", err)
 	}
 
 	return nil
@@ -192,4 +206,49 @@ func ensureStudentSchemaCompatibility(db *gorm.DB) error {
 	}
 
 	return nil
+}
+
+func ensureDefaultPrograms(db *gorm.DB) error {
+	// Create a default center and 3 default programs used by the institution.
+	// This is idempotent and safe for existing databases.
+	return db.Exec(`
+		DO $$
+		DECLARE
+			v_center_id BIGINT;
+		BEGIN
+			INSERT INTO educational_centers (name, code, is_active, created_at, updated_at)
+			VALUES ('Centro Educacional Prof. Paulo Rossi Severino', 'CEPROS', true, NOW(), NOW())
+			ON CONFLICT (code) DO UPDATE SET
+				name = EXCLUDED.name,
+				updated_at = NOW();
+
+			SELECT id INTO v_center_id FROM educational_centers WHERE code = 'CEPROS' LIMIT 1;
+
+			INSERT INTO programs (center_id, code, name, is_active, created_at, updated_at)
+			VALUES
+				(v_center_id, 'SEMEAR', 'Semear', true, NOW(), NOW()),
+				(v_center_id, 'VOAR', 'Voar', true, NOW(), NOW()),
+				(v_center_id, 'CECOR', 'Cecor', true, NOW(), NOW())
+			ON CONFLICT (code) DO UPDATE SET
+				center_id = EXCLUDED.center_id,
+				name = EXCLUDED.name,
+				is_active = EXCLUDED.is_active,
+				updated_at = NOW();
+		END
+		$$;
+	`).Error
+}
+
+func backfillTeacherPrograms(db *gorm.DB) error {
+	// Keep teacher_programs in sync for existing data:
+	// derive teacher->program pairs from teacher_courses + courses.program_id.
+	return db.Exec(`
+		INSERT INTO teacher_programs (teacher_id, program_id, role, is_active, created_at, updated_at)
+		SELECT DISTINCT tc.teacher_id, c.program_id, 'teacher', true, NOW(), NOW()
+		FROM teacher_courses tc
+		INNER JOIN courses c ON c.id = tc.course_id
+		WHERE c.program_id IS NOT NULL
+		  AND tc.teacher_id IS NOT NULL
+		ON CONFLICT (teacher_id, program_id) DO NOTHING;
+	`).Error
 }

@@ -91,6 +91,16 @@ func (h *StudentHandler) GetStudents(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	programParam := r.URL.Query().Get("program_id")
+	if programParam == "" {
+		programParam = r.URL.Query().Get("programId")
+	}
+	if programParam != "" {
+		if id, err := strconv.Atoi(programParam); err == nil {
+			filters["program_id"] = id
+		}
+	}
+
 	// Call service
 	students, total, err := h.studentService.GetStudents(r.Context(), page, pageSize, filters)
 	if err != nil {

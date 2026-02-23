@@ -13,6 +13,7 @@ export interface StudentFilters {
   cpf?: string;
   status?: string;
   courseId?: number;
+  programId?: number;
   ageMin?: number;
   ageMax?: number;
 }

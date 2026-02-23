@@ -70,6 +70,9 @@ func (r *studentRepository) FindAll(ctx context.Context, page int, pageSize int,
 			// Filter by course requires a join with enrollments
 			query = query.Joins("JOIN enrollments ON enrollments.student_id = students.id").
 				Where("enrollments.course_id = ? AND enrollments.status IN ('active', 'in_progress')", value)
+		case "program_id":
+			query = query.Joins("JOIN student_programs sp ON sp.student_id = students.id").
+				Where("sp.program_id = ? AND sp.status = 'active'", value)
 		}
 	}
 
@@ -97,6 +100,10 @@ func (r *studentRepository) FindAll(ctx context.Context, page int, pageSize int,
 	// Calculate ages
 	for i := range students {
 		students[i].User.CalculateAge()
+	}
+
+	if err := r.hydrateStudentsProgramIDs(ctx, students); err != nil {
+		return nil, 0, err
 	}
 
 	return students, total, nil
@@ -127,6 +134,12 @@ func (r *studentRepository) FindByID(ctx context.Context, id uint) (*models.Stud
 	// Calculate age
 	student.User.CalculateAge()
 
+	programIDs, err := r.getStudentProgramIDsByStudentID(ctx, student.ID)
+	if err != nil {
+		return nil, err
+	}
+	student.ProgramIDs = programIDs
+
 	return &student, nil
 }
 
@@ -155,6 +168,12 @@ func (r *studentRepository) FindByEmail(ctx context.Context, email string) (*mod
 
 	// Calculate age
 	student.User.CalculateAge()
+
+	programIDs, err := r.getStudentProgramIDsByStudentID(ctx, student.ID)
+	if err != nil {
+		return nil, err
+	}
+	student.ProgramIDs = programIDs
 
 	return &student, nil
 }
@@ -187,6 +206,12 @@ func (r *studentRepository) FindByCPF(ctx context.Context, cpf string) (*models.
 
 	// Calculate age
 	student.User.CalculateAge()
+
+	programIDs, err := r.getStudentProgramIDsByStudentID(ctx, student.ID)
+	if err != nil {
+		return nil, err
+	}
+	student.ProgramIDs = programIDs
 
 	return &student, nil
 }
@@ -251,6 +276,10 @@ func (r *studentRepository) Create(ctx context.Context, student *models.Student)
 			return fmt.Errorf("error creating student: %w", err)
 		}
 
+		if err := r.replaceStudentProgramsTx(tx, student.ID, student.ProgramIDs); err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
@@ -306,6 +335,12 @@ func (r *studentRepository) Update(ctx context.Context, student *models.Student)
 		// Update student
 		if err := tx.Model(student).Updates(student).Error; err != nil {
 			return fmt.Errorf("error updating student: %w", err)
+		}
+
+		if student.ProgramIDs != nil {
+			if err := r.replaceStudentProgramsTx(tx, student.ID, student.ProgramIDs); err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -453,6 +488,92 @@ func (r *studentRepository) RemoveGuardian(ctx context.Context, guardianID uint)
 		Where("id = ?", guardianID).
 		Update("deleted_at", gorm.Expr("NOW()")).Error; err != nil {
 		return fmt.Errorf("error removing guardian: %w", err)
+	}
+
+	return nil
+}
+
+func (r *studentRepository) getStudentProgramIDsByStudentID(ctx context.Context, studentID uint) ([]uint, error) {
+	var ids []uint
+	if err := r.db.WithContext(ctx).
+		Table("student_programs").
+		Select("program_id").
+		Where("student_id = ? AND status = 'active'", studentID).
+		Order("program_id ASC").
+		Scan(&ids).Error; err != nil {
+		return nil, fmt.Errorf("error loading student programs: %w", err)
+	}
+	return ids, nil
+}
+
+func (r *studentRepository) hydrateStudentsProgramIDs(ctx context.Context, students []models.Student) error {
+	if len(students) == 0 {
+		return nil
+	}
+
+	studentIDs := make([]uint, 0, len(students))
+	for _, s := range students {
+		studentIDs = append(studentIDs, s.ID)
+	}
+
+	type studentProgramRow struct {
+		StudentID uint
+		ProgramID uint
+	}
+
+	var rows []studentProgramRow
+	if err := r.db.WithContext(ctx).
+		Table("student_programs").
+		Select("student_id, program_id").
+		Where("student_id IN ? AND status = 'active'", studentIDs).
+		Order("program_id ASC").
+		Scan(&rows).Error; err != nil {
+		return fmt.Errorf("error loading student programs: %w", err)
+	}
+
+	byStudent := make(map[uint][]uint, len(studentIDs))
+	for _, row := range rows {
+		byStudent[row.StudentID] = append(byStudent[row.StudentID], row.ProgramID)
+	}
+
+	for i := range students {
+		students[i].ProgramIDs = byStudent[students[i].ID]
+	}
+
+	return nil
+}
+
+func (r *studentRepository) replaceStudentProgramsTx(tx *gorm.DB, studentID uint, programIDs []uint) error {
+	if err := tx.Where("student_id = ?", studentID).Delete(&models.StudentProgram{}).Error; err != nil {
+		return fmt.Errorf("error clearing student programs: %w", err)
+	}
+
+	if len(programIDs) == 0 {
+		return nil
+	}
+
+	unique := make(map[uint]struct{}, len(programIDs))
+	for _, id := range programIDs {
+		if id > 0 {
+			unique[id] = struct{}{}
+		}
+	}
+
+	links := make([]models.StudentProgram, 0, len(unique))
+	for programID := range unique {
+		links = append(links, models.StudentProgram{
+			StudentID: studentID,
+			ProgramID: programID,
+			Status:    "active",
+		})
+	}
+
+	if len(links) == 0 {
+		return nil
+	}
+
+	if err := tx.Create(&links).Error; err != nil {
+		return fmt.Errorf("error creating student programs: %w", err)
 	}
 
 	return nil

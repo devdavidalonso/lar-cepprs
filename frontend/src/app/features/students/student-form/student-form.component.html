@@ -321,6 +321,19 @@
                 </p>
               </div>
 
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Programas</mat-label>
+                <mat-select formControlName="programIds" multiple>
+                  <mat-option *ngFor="let program of programs" [value]="program.id">
+                    {{ program.name }}
+                  </mat-option>
+                </mat-select>
+                <mat-hint>Selecione um ou mais programas para este aluno.</mat-hint>
+                <mat-error *ngIf="studentDataForm.get('programIds')?.hasError('required')">
+                  Selecione pelo menos um programa.
+                </mat-error>
+              </mat-form-field>
+
               <!-- Emergency Contact removed (handled by Guardians) -->
 
               <!-- Additional Phones removed -->
@@ -613,6 +626,10 @@
                         ? "Inativo"
                         : "Suspenso"
                   }}</span>
+                </div>
+                <div class="review-item full-width">
+                  <strong>Programas:</strong>
+                  <span>{{ getProgramNames(studentDataForm.get("programIds")?.value) }}</span>
                 </div>
                 <!-- Emergency Contact removed from review -->
               </div>

@@ -201,6 +201,7 @@ func main() {
 	courseClassHandler := handlers.NewCourseClassHandler(db)
 	skillHandler := handlers.NewSkillHandler(db)
 	migrationHandler := handlers.NewMigrationHandler(db)
+	programHandler := handlers.NewProgramHandler(db)
 
 	// Registrar todas as rotas v1 sob um único prefixo /api/v1
 	appLogger.Info("Registering v1 routes...")
@@ -212,6 +213,9 @@ func main() {
 			// Módulos adicionais protegidos
 			r.Group(func(r chi.Router) {
 				r.Use(apiMiddleware.Authenticate(cfg))
+
+				// Programs
+				r.Get("/programs", programHandler.ListPrograms)
 
 				// Interview endpoints
 				interviewHandler.RegisterRoutes(r)

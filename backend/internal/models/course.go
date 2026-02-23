@@ -7,6 +7,7 @@ import (
 // Course represents a course in the system
 type Course struct {
 	ID                  uint       `json:"id" gorm:"primaryKey"`
+	ProgramID           *uint      `json:"programId" gorm:"index"`
 	Name                string     `json:"name" gorm:"not null"`
 	ShortDescription    string     `json:"shortDescription"`
 	CoverImage          string     `json:"coverImage"` // URL to course banner
@@ -34,6 +35,7 @@ type Course struct {
 	// Associations
 	ClassSessions  []ClassSession  `json:"classSessions,omitempty" gorm:"foreignKey:CourseID"`
 	TeacherCourses []TeacherCourse `json:"teacherCourses,omitempty" gorm:"foreignKey:CourseID"`
+	Program        *Program        `json:"program,omitempty" gorm:"foreignKey:ProgramID"`
 }
 
 // TableName defines the table name in the database

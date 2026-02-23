@@ -44,4 +44,16 @@ type UserRepository interface {
 
 	// FindByProfileID finds users by profile ID
 	FindByProfileID(ctx context.Context, profileID uint) ([]models.User, error)
+
+	// UpsertTeacherProfile creates/updates teacher record linked to a user
+	UpsertTeacherProfile(ctx context.Context, userID uint, specialization, bio, phone string, active bool) error
+
+	// GetTeacherProfileByUserID returns teacher profile row linked to a user
+	GetTeacherProfileByUserID(ctx context.Context, userID uint) (*models.Teacher, error)
+
+	// ReplaceTeacherProgramsByUserID replaces all program links for a teacher (via user_id)
+	ReplaceTeacherProgramsByUserID(ctx context.Context, userID uint, programIDs []uint) error
+
+	// GetTeacherProgramIDsByUserID returns program IDs linked to a teacher (via user_id)
+	GetTeacherProgramIDsByUserID(ctx context.Context, userID uint) ([]uint, error)
 }

@@ -19,6 +19,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CourseService, Course } from '../../../core/services/course.service';
 import { LocationService, Location } from '../../../core/services/location.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ProgramService } from '@core/services/program.service';
+import { Program } from '@core/models/program.model';
 
 @Component({
   selector: 'app-course-form',
@@ -67,7 +69,20 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                 <p class="step-desc">Define the core identity of the course.</p>
                 
                 <div class="form-grid">
-                  <!-- Name & Category -->
+                  <!-- Program, Name & Category -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Programa</mat-label>
+                    <mat-select formControlName="programId">
+                      <mat-option *ngFor="let program of programs" [value]="program.id">
+                        {{ program.name }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-hint>Cada curso pertence a um programa.</mat-hint>
+                    <mat-error *ngIf="basicInfoForm.get('programId')?.hasError('required')">
+                      Programa é obrigatório.
+                    </mat-error>
+                  </mat-form-field>
+
                   <div class="row">
                       <mat-form-field appearance="outline" class="flex-2">
                         <mat-label>{{ 'COURSE.NAME' | translate }}</mat-label>
@@ -322,6 +337,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                     <h4>{{ basicInfoForm.get('name')?.value }}</h4>
                     <p>{{ basicInfoForm.get('shortDescription')?.value }}</p>
                     <p><strong>Category:</strong> {{ basicInfoForm.get('category')?.value }}</p>
+                    <p><strong>Programa:</strong> {{ getProgramName(basicInfoForm.get('programId')?.value) }}</p>
                     <p><strong>Professor:</strong> {{ getProfessorName(teamForm.get('teacherId')?.value) }}</p>
                     <p><strong>Location:</strong> {{ getLocationName(venueForm.get('locationId')?.value) }}</p>
                     <hr>
@@ -489,6 +505,7 @@ export class CourseFormComponent implements OnInit {
   // Data Sources
   professors: any[] = [];
   locations: Location[] = [];
+  programs: Program[] = [];
   
   generatedSchedule: any[] = [];
 
@@ -496,12 +513,14 @@ export class CourseFormComponent implements OnInit {
     private _formBuilder: FormBuilder,
     private courseService: CourseService,
     private locationService: LocationService,
+    private programService: ProgramService,
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
   ) {
     // Step 1: Basic Info
     this.basicInfoForm = this._formBuilder.group({
+      programId: [null, Validators.required],
       name: ['', Validators.required],
       category: ['Technology', Validators.required],
       shortDescription: ['', Validators.maxLength(150)],
@@ -534,9 +553,17 @@ export class CourseFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPrograms();
     this.loadProfessors();
     this.loadLocations();
     this.checkEditMode();
+  }
+
+  loadPrograms() {
+    this.programService.listPrograms(true).subscribe({
+      next: (programs) => this.programs = programs,
+      error: (err) => console.error('Error loading programs', err)
+    });
   }
 
   loadProfessors() {
@@ -567,6 +594,7 @@ export class CourseFormComponent implements OnInit {
       next: (course) => {
         // Patch Basic Info
         this.basicInfoForm.patchValue({
+          programId: course.programId ?? null,
           name: course.name,
           category: course.category || 'Technology',
           shortDescription: course.shortDescription,
@@ -611,6 +639,12 @@ export class CourseFormComponent implements OnInit {
   getProfessorName(id: number): string {
       const prof = this.professors.find(p => p.id === id);
       return prof ? prof.name : 'Unknown';
+  }
+
+  getProgramName(id: number | null | undefined): string {
+      if (!id) return 'Não definido';
+      const program = this.programs.find((p) => p.id === id);
+      return program ? program.name : 'Não definido';
   }
 
   getLocationName(id: number): string {

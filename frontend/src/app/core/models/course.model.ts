@@ -1,5 +1,6 @@
 export interface Course {
   id?: number;
+  programId?: number;
   name: string;
   category?: string;
   coverImage?: string;

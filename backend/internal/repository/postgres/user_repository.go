@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -289,4 +290,127 @@ func (r *userRepository) FindByProfileID(ctx context.Context, profileID uint) ([
 	}
 
 	return users, nil
+}
+
+// UpsertTeacherProfile creates/updates teacher metadata linked to a user.
+func (r *userRepository) UpsertTeacherProfile(ctx context.Context, userID uint, specialization, bio, phone string, active bool) error {
+	teacher, err := r.GetTeacherProfileByUserID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if teacher == nil {
+		newTeacher := models.Teacher{
+			UserID:         userID,
+			Specialization: specialization,
+			Bio:            bio,
+			Phone:          phone,
+			Active:         active,
+		}
+		if err := r.db.WithContext(ctx).Create(&newTeacher).Error; err != nil {
+			return fmt.Errorf("error creating teacher profile: %w", err)
+		}
+		return nil
+	}
+
+	updates := map[string]interface{}{
+		"specialization": specialization,
+		"bio":            bio,
+		"phone":          phone,
+		"active":         active,
+	}
+	if err := r.db.WithContext(ctx).Model(&models.Teacher{}).
+		Where("id = ?", teacher.ID).
+		Updates(updates).Error; err != nil {
+		return fmt.Errorf("error updating teacher profile: %w", err)
+	}
+
+	return nil
+}
+
+// GetTeacherProfileByUserID returns teacher row for a user.
+func (r *userRepository) GetTeacherProfileByUserID(ctx context.Context, userID uint) (*models.Teacher, error) {
+	var teacher models.Teacher
+	err := r.db.WithContext(ctx).Where("user_id = ?", userID).First(&teacher).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error finding teacher profile: %w", err)
+	}
+	return &teacher, nil
+}
+
+// ReplaceTeacherProgramsByUserID replaces all teacher-program links for a given user.
+func (r *userRepository) ReplaceTeacherProgramsByUserID(ctx context.Context, userID uint, programIDs []uint) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var teacher models.Teacher
+		err := tx.Where("user_id = ?", userID).First(&teacher).Error
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("error finding teacher profile for programs: %w", err)
+		}
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newTeacher := models.Teacher{
+				UserID: userID,
+				Active: true,
+			}
+			if err := tx.Create(&newTeacher).Error; err != nil {
+				return fmt.Errorf("error creating teacher profile for programs: %w", err)
+			}
+			teacher = newTeacher
+		}
+
+		if err := tx.Where("teacher_id = ?", teacher.ID).Delete(&models.TeacherProgram{}).Error; err != nil {
+			return fmt.Errorf("error clearing teacher programs: %w", err)
+		}
+
+		if len(programIDs) == 0 {
+			return nil
+		}
+
+		unique := make(map[uint]struct{}, len(programIDs))
+		for _, id := range programIDs {
+			if id > 0 {
+				unique[id] = struct{}{}
+			}
+		}
+		ids := make([]uint, 0, len(unique))
+		for id := range unique {
+			ids = append(ids, id)
+		}
+		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+		links := make([]models.TeacherProgram, 0, len(ids))
+		for _, programID := range ids {
+			links = append(links, models.TeacherProgram{
+				TeacherID: teacher.ID,
+				ProgramID: programID,
+				Role:      "teacher",
+				IsActive:  true,
+			})
+		}
+
+		if err := tx.Create(&links).Error; err != nil {
+			return fmt.Errorf("error creating teacher programs: %w", err)
+		}
+
+		return nil
+	})
+}
+
+// GetTeacherProgramIDsByUserID lists all linked programs for the teacher represented by userID.
+func (r *userRepository) GetTeacherProgramIDsByUserID(ctx context.Context, userID uint) ([]uint, error) {
+	var ids []uint
+	err := r.db.WithContext(ctx).
+		Table("teacher_programs tp").
+		Select("tp.program_id").
+		Joins("JOIN teachers t ON t.id = tp.teacher_id").
+		Where("t.user_id = ?", userID).
+		Order("tp.program_id ASC").
+		Scan(&ids).Error
+	if err != nil {
+		return nil, fmt.Errorf("error listing teacher programs: %w", err)
+	}
+	return ids, nil
 }
