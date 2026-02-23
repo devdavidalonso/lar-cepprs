@@ -87,7 +87,7 @@ func Load() (*Config, error) {
 			PostgresPort:     pgPort,
 			PostgresUser:     getEnv("POSTGRES_USER", "cecor"),
 			PostgresPassword: getEnv("POSTGRES_PASSWORD", "cecor123"),
-			PostgresDB:       getEnv("POSTGRES_DB", "cecor_db"),
+			PostgresDB:       getEnv("POSTGRES_DB", "cepr_db"),
 			PostgresSSLMode:  getEnv("POSTGRES_SSLMODE", "disable"),
 			MongoURI:         getEnv("MONGO_URI", "mongodb://mongo:27017"),
 		},

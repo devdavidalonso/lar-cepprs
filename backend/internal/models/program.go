@@ -5,8 +5,8 @@ import "time"
 // EducationalCenter represents an educational center (e.g. CE Prof. Paulo Rossi Severino).
 type EducationalCenter struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name" gorm:"not null;uniqueIndex"`
-	Code      string    `json:"code" gorm:"not null;uniqueIndex"`
+	Name      string    `json:"name" gorm:"not null;unique"`
+	Code      string    `json:"code" gorm:"not null;unique"`
 	IsActive  bool      `json:"isActive" gorm:"default:true"`
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

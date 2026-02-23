@@ -25,7 +25,7 @@ Use **GitHub Environments** (`staging`, `production`) com `Variables` e `Secrets
 - `BACKEND_ENV_VARS`
 
 Exemplo de `BACKEND_ENV_VARS`:
-`APP_ENV=staging,SERVER_PORT=8080,POSTGRES_HOST=10.10.0.3,POSTGRES_PORT=5432,POSTGRES_USER=cecor,POSTGRES_DB=cecor_db,POSTGRES_SSLMODE=disable,SSO_CLIENT_ID=cecor-backend,SSO_REDIRECT_URL=https://api-staging.cecor.hrbsys.tech/*,SSO_AUTH_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/auth,SSO_TOKEN_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/token,SSO_USER_INFO_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/userinfo`
+`APP_ENV=staging,SERVER_PORT=8080,POSTGRES_HOST=10.10.0.3,POSTGRES_PORT=5432,POSTGRES_USER=cecor,POSTGRES_DB=cepr_db,POSTGRES_SSLMODE=disable,SSO_CLIENT_ID=cecor-backend,SSO_REDIRECT_URL=https://api-staging.cecor.hrbsys.tech/*,SSO_AUTH_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/auth,SSO_TOKEN_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/token,SSO_USER_INFO_URL=https://lar-sso-keycloak.hrbsys.tech/realms/cecor/protocol/openid-connect/userinfo`
 
 ### Secrets (por ambiente)
 - `GCP_WORKLOAD_IDENTITY_PROVIDER`

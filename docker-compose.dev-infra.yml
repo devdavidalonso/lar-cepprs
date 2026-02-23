@@ -1,29 +1,29 @@
-# LAR CECOR - Infra local para desenvolvimento
+# LAR CEPPRS - Infra local para desenvolvimento
 # Objetivo: rodar apenas dependências (DB/cache/mensageria) via Docker.
 # Backend e Frontend devem rodar localmente (go run / npm start).
 
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: lar-cecor-dev-postgres
+    container_name: lar-cepprs-dev-postgres
     environment:
       POSTGRES_USER: cecor
       POSTGRES_PASSWORD: cecor123
-      POSTGRES_DB: cecor_db
+      POSTGRES_DB: cepr_db
     ports:
       - "5433:5432"
     volumes:
       - dev-postgres-data:/var/lib/postgresql/data
       - ./backend/scripts/postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cecor -d cecor_db"]
+      test: ["CMD-SHELL", "pg_isready -U cecor -d cepr_db"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   mongodb:
     image: mongo:7.0
-    container_name: lar-cecor-dev-mongodb
+    container_name: lar-cepprs-dev-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
@@ -35,7 +35,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: lar-cecor-dev-redis
+    container_name: lar-cepprs-dev-redis
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
@@ -44,7 +44,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: lar-cecor-dev-rabbitmq
+    container_name: lar-cepprs-dev-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest

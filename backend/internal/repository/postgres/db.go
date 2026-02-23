@@ -217,18 +217,24 @@ func ensureDefaultPrograms(db *gorm.DB) error {
 			v_center_id BIGINT;
 		BEGIN
 			INSERT INTO educational_centers (name, code, is_active, created_at, updated_at)
-			VALUES ('Centro Educacional Prof. Paulo Rossi Severino', 'CEPROS', true, NOW(), NOW())
+			VALUES ('Centro Educacional Prof. Paulo Rossi Severino', 'cepprs', true, NOW(), NOW())
 			ON CONFLICT (code) DO UPDATE SET
 				name = EXCLUDED.name,
 				updated_at = NOW();
 
-			SELECT id INTO v_center_id FROM educational_centers WHERE code = 'CEPROS' LIMIT 1;
+			-- Handle both old and new identifiers to keep startup idempotent.
+			SELECT id INTO v_center_id
+			FROM educational_centers
+			WHERE code IN ('cepprs', 'CEPROS')
+			   OR name = 'Centro Educacional Prof. Paulo Rossi Severino'
+			ORDER BY id
+			LIMIT 1;
 
 			INSERT INTO programs (center_id, code, name, is_active, created_at, updated_at)
 			VALUES
-				(v_center_id, 'SEMEAR', 'Semear', true, NOW(), NOW()),
-				(v_center_id, 'VOAR', 'Voar', true, NOW(), NOW()),
-				(v_center_id, 'CECOR', 'Cecor', true, NOW(), NOW())
+				(v_center_id, 'seeds', 'Semear', true, NOW(), NOW()),
+				(v_center_id, 'fly', 'Voar', true, NOW(), NOW()),
+				(v_center_id, 'cecor', 'Cecor', true, NOW(), NOW())
 			ON CONFLICT (code) DO UPDATE SET
 				center_id = EXCLUDED.center_id,
 				name = EXCLUDED.name,
